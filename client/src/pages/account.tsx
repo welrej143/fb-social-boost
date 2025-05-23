@@ -134,62 +134,7 @@ export default function Account() {
             </CardContent>
           </Card>
 
-          {/* Wallet & Balance */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Wallet className="w-5 h-5" />
-                <span>Wallet & Balance</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-center">
-                <div className="flex items-center justify-center space-x-2 mb-2">
-                  <DollarSign className="w-6 h-6 text-green-600" />
-                  <span className="text-3xl font-bold text-green-600">
-                    ${user?.balance || '0.00'}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-600">Available Balance</p>
-              </div>
-              
-              <Separator />
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Add Funds (Minimum $10.00)
-                </label>
-                <div className="flex space-x-2">
-                  <select 
-                    value={depositAmount}
-                    onChange={(e) => setDepositAmount(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  >
-                    <option value="10.00">$10.00</option>
-                    <option value="25.00">$25.00</option>
-                    <option value="50.00">$50.00</option>
-                    <option value="100.00">$100.00</option>
-                    <option value="250.00">$250.00</option>
-                    <option value="500.00">$500.00</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div className="pt-2">
-                <PayPalButton
-                  amount={depositAmount}
-                  currency="USD"
-                  intent="CAPTURE"
-                />
-              </div>
-              
-              <div className="bg-blue-50 p-3 rounded-lg">
-                <p className="text-xs text-blue-700">
-                  💡 Funds are added instantly after successful payment. Use your balance to purchase any Facebook boosting services.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+
         </div>
       </div>
     </div>
