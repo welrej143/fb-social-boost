@@ -342,8 +342,7 @@ export default function Home() {
                       </div>
                     )}
 
-                    {!showPayPal ? (
-                      <form onSubmit={handleSubmitOrder} className="space-y-6">
+                    <form onSubmit={handleSubmitOrder} className="space-y-6">
                         {/* Facebook Link Input */}
                         <div>
                           <Label htmlFor="facebook-link">
@@ -418,51 +417,69 @@ export default function Home() {
                           </div>
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-4">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={handleBackToServices}
-                            className="flex-1"
-                          >
-                            <ArrowLeft className="w-4 h-4 mr-2" />
-                            Back to Services
-                          </Button>
-                          <Button
-                            type="submit"
-                            className="flex-1 bg-blue-600 hover:bg-blue-700"
-                            disabled={createOrderMutation.isPending}
-                          >
-                            {createOrderMutation.isPending ? "Creating Order..." : "Create Order"}
-                          </Button>
-                        </div>
-                      </form>
-                    ) : (
-                      /* PayPal Payment Section */
-                      <div className="text-center space-y-6">
-                        <div>
-                          <h3 className="text-lg font-semibold mb-2">Complete Payment</h3>
-                          <p className="text-gray-600">Order Total: ${totalPrice}</p>
-                        </div>
-                        
-                        <div className="max-w-xs mx-auto">
-                          <PayPalButton
-                            amount={totalPrice}
-                            currency="USD"
-                            intent="CAPTURE"
-                          />
+                        {/* Wallet Payment Section */}
+                        <div className="bg-gray-50 rounded-lg p-4">
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Current Balance:</span>
+                              <span className="font-medium text-green-600">${userBalance}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Order Total:</span>
+                              <span className="font-medium">${totalPrice}</span>
+                            </div>
+                            <Separator />
+                            <div className="flex justify-between">
+                              <span className="font-semibold">Remaining Balance:</span>
+                              <span className={`font-semibold ${
+                                parseFloat(userBalance) >= parseFloat(totalPrice) 
+                                  ? 'text-green-600' 
+                                  : 'text-red-500'
+                              }`}>
+                                ${(parseFloat(userBalance) - parseFloat(totalPrice)).toFixed(2)}
+                              </span>
+                            </div>
+                          </div>
                         </div>
 
+                        {parseFloat(userBalance) >= parseFloat(totalPrice) ? (
+                          <Button
+                            type="submit"
+                            className="w-full bg-blue-600 hover:bg-blue-700"
+                            disabled={createOrderMutation.isPending}
+                          >
+                            {createOrderMutation.isPending ? "Processing Order..." : "Pay with Wallet Balance"}
+                          </Button>
+                        ) : (
+                          <div className="text-center space-y-4">
+                            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                              <p className="text-red-700 text-sm">
+                                Insufficient balance. You need ${(parseFloat(totalPrice) - parseFloat(userBalance)).toFixed(2)} more.
+                              </p>
+                            </div>
+                            <Button
+                              type="button"
+                              onClick={() => {
+                                setShowWallet(true);
+                                setShowOrderForm(false);
+                              }}
+                              className="w-full"
+                            >
+                              Add Funds to Wallet
+                            </Button>
+                          </div>
+                        )}
+
                         <Button
+                          type="button"
                           variant="outline"
                           onClick={handleBackToServices}
                           className="w-full"
                         >
+                          <ArrowLeft className="w-4 h-4 mr-2" />
                           Cancel Order
                         </Button>
-                      </div>
-                    )}
+                      </form>
                   </CardContent>
                 </Card>
               )}
