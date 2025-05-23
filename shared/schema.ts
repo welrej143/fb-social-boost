@@ -6,6 +6,8 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  balance: text("balance").notNull().default("0.00"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const services = pgTable("services", {
@@ -26,6 +28,16 @@ export const orders = pgTable("orders", {
   amount: text("amount").notNull(),
   status: text("status").notNull().default("Processing"),
   paypalOrderId: text("paypal_order_id"),
+  smmOrderId: text("smm_order_id"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const deposits = pgTable("deposits", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  amount: text("amount").notNull(),
+  status: text("status").notNull().default("Pending"),
+  paypalOrderId: text("paypal_order_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -44,6 +56,11 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
   createdAt: true,
 });
 
+export const insertDepositSchema = createInsertSchema(deposits).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
@@ -52,3 +69,6 @@ export type Service = typeof services.$inferSelect;
 
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
 export type Order = typeof orders.$inferSelect;
+
+export type InsertDeposit = z.infer<typeof insertDepositSchema>;
+export type Deposit = typeof deposits.$inferSelect;

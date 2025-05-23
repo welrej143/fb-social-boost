@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertOrderSchema } from "@shared/schema";
+import { insertOrderSchema, insertDepositSchema } from "@shared/schema";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 
 const SMM_API_BASE = "https://smmvaly.com/api/v2";
@@ -113,48 +113,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid service" });
       }
 
-      // Submit order to SMM API
-      const smmResponse = await fetch(SMM_API_BASE, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          key: SMM_API_KEY,
-          action: 'add',
-          service: orderData.serviceId,
-          link: orderData.link,
-          quantity: orderData.quantity.toString()
-        })
+      // Create order in our storage with pending payment status
+      const order = await storage.createOrder({
+        ...orderData,
+        status: "Pending Payment"
       });
 
-      if (!smmResponse.ok) {
-        throw new Error(`SMM API error: ${smmResponse.status}`);
-      }
-
-      const smmResult = await smmResponse.json();
-
-      if (smmResult.order) {
-        // Create order in our storage
-        const order = await storage.createOrder({
-          ...orderData,
-          orderId: smmResult.order.toString(),
-          status: "Processing"
-        });
-
-        res.json({ 
-          success: true, 
-          order: {
-            id: order.orderId,
-            status: order.status,
-            service: order.serviceName,
-            quantity: order.quantity,
-            amount: order.amount
-          }
-        });
-      } else {
-        throw new Error(smmResult.error || "Order submission failed");
-      }
+      res.json({ 
+        success: true, 
+        order: {
+          id: order.orderId,
+          status: order.status,
+          service: order.serviceName,
+          quantity: order.quantity,
+          amount: order.amount
+        }
+      });
     } catch (error) {
       console.error("Order creation error:", error);
       res.status(500).json({ 

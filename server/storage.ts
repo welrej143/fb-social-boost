@@ -1,4 +1,4 @@
-import { users, services, orders, type User, type InsertUser, type Service, type InsertService, type Order, type InsertOrder } from "@shared/schema";
+import { users, services, orders, deposits, type User, type InsertUser, type Service, type InsertService, type Order, type InsertOrder, type Deposit, type InsertDeposit } from "@shared/schema";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { eq } from "drizzle-orm";
@@ -7,6 +7,7 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUserBalance(userId: number, newBalance: string): Promise<User | undefined>;
   
   getService(serviceId: string): Promise<Service | undefined>;
   getAllServices(): Promise<Service[]>;
@@ -16,6 +17,12 @@ export interface IStorage {
   getAllOrders(): Promise<Order[]>;
   createOrder(order: InsertOrder): Promise<Order>;
   updateOrderStatus(orderId: string, status: string): Promise<Order | undefined>;
+  updateOrderSmmId(orderId: string, smmOrderId: string): Promise<Order | undefined>;
+  
+  createDeposit(deposit: InsertDeposit): Promise<Deposit>;
+  getDeposit(id: number): Promise<Deposit | undefined>;
+  updateDepositStatus(id: number, status: string): Promise<Deposit | undefined>;
+  getUserDeposits(userId: number): Promise<Deposit[]>;
 }
 
 // Database storage implementation
@@ -96,6 +103,47 @@ export class DbStorage implements IStorage {
       .where(eq(orders.orderId, orderId))
       .returning();
     return result[0];
+  }
+
+  async updateOrderSmmId(orderId: string, smmOrderId: string): Promise<Order | undefined> {
+    const result = await this.db
+      .update(orders)
+      .set({ smmOrderId })
+      .where(eq(orders.orderId, orderId))
+      .returning();
+    return result[0];
+  }
+
+  async updateUserBalance(userId: number, newBalance: string): Promise<User | undefined> {
+    const result = await this.db
+      .update(users)
+      .set({ balance: newBalance })
+      .where(eq(users.id, userId))
+      .returning();
+    return result[0];
+  }
+
+  async createDeposit(insertDeposit: InsertDeposit): Promise<Deposit> {
+    const result = await this.db.insert(deposits).values(insertDeposit).returning();
+    return result[0];
+  }
+
+  async getDeposit(id: number): Promise<Deposit | undefined> {
+    const result = await this.db.select().from(deposits).where(eq(deposits.id, id));
+    return result[0];
+  }
+
+  async updateDepositStatus(id: number, status: string): Promise<Deposit | undefined> {
+    const result = await this.db
+      .update(deposits)
+      .set({ status })
+      .where(eq(deposits.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async getUserDeposits(userId: number): Promise<Deposit[]> {
+    return await this.db.select().from(deposits).where(eq(deposits.userId, userId));
   }
 }
 
