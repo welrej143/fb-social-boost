@@ -267,7 +267,15 @@ export default function Home() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.location.href = '/api/logout'}
+                    onClick={async () => {
+                      try {
+                        await apiRequest('/api/logout', 'POST');
+                        queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+                        window.location.reload();
+                      } catch (error) {
+                        console.error('Logout error:', error);
+                      }
+                    }}
                     className="flex items-center space-x-1"
                   >
                     <LogOut className="w-4 h-4" />
@@ -276,7 +284,7 @@ export default function Home() {
                 </div>
               ) : (
                 <Button
-                  onClick={() => window.location.href = '/api/login'}
+                  onClick={() => window.location.href = '/login'}
                   className="flex items-center space-x-1 bg-blue-600 hover:bg-blue-700"
                 >
                   <LogIn className="w-4 h-4" />
