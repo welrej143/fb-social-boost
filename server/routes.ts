@@ -205,7 +205,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/orders", isAuthenticated, async (req: any, res) => {
     try {
       console.log('Creating order with data:', req.body);
-      const orderData = insertOrderSchema.parse(req.body);
+      const userId = req.session.userId;
+      
+      // Add userId to the order data
+      const orderDataWithUser = {
+        ...req.body,
+        userId: userId
+      };
+      
+      const orderData = insertOrderSchema.parse(orderDataWithUser);
       
       // Validate Facebook URL
       const facebookUrlPattern = /^https?:\/\/(www\.)?(facebook|fb)\.com\/.+/i;
