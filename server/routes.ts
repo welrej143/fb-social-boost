@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import express from "express";
+import { json } from "express";
 import { storage } from "./storage";
 import { getSession, isAuthenticated, hashPassword, comparePassword } from "./auth";
 import { insertOrderSchema, insertDepositSchema, insertUserSchema, loginSchema } from "@shared/schema";
@@ -24,7 +24,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(getSession());
   
   // Add express.json middleware for parsing request bodies
-  app.use(require('express').json());
+  app.use(json());
 
   // Auth routes
   app.post('/api/register', async (req, res) => {

@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import session from "express-session";
+import connectPg from "connect-pg-simple";
 import type { Express, RequestHandler } from "express";
 import { storage } from "./storage";
 
@@ -11,13 +12,21 @@ declare module "express-session" {
 }
 
 export function getSession() {
+  const pgStore = connectPg(session);
+  const sessionStore = new pgStore({
+    conString: process.env.DATABASE_URL,
+    createTableIfMissing: true,
+    ttl: 7 * 24 * 60 * 60, // 1 week in seconds
+  });
+
   return session({
     secret: process.env.SESSION_SECRET || "facebook-boost-secret-key-2024",
-    resave: true,
-    saveUninitialized: true,
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: false, // Set to true in production with HTTPS
+      secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
       sameSite: 'lax'
     },
