@@ -519,10 +519,10 @@ export default function Home() {
                     <Input
                       id="custom-amount"
                       type="number"
-                      min="5"
+                      min="10"
                       max="1000"
                       value={depositAmount}
-                      onChange={(e) => setDepositAmount(Math.max(5, parseInt(e.target.value) || 5))}
+                      onChange={(e) => setDepositAmount(Math.max(10, parseInt(e.target.value) || 10))}
                       className="w-24"
                     />
                   </div>
