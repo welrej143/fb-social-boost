@@ -22,7 +22,9 @@ import {
   Star,
   Menu,
   Minus,
-  Plus
+  Plus,
+  Wallet,
+  DollarSign
 } from "lucide-react";
 
 interface Service {
@@ -77,8 +79,11 @@ export default function Home() {
   const [quantity, setQuantity] = useState(1);
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
+  const [showWallet, setShowWallet] = useState(false);
   const [showPayPal, setShowPayPal] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
+  const [depositAmount, setDepositAmount] = useState(10);
+  const [userBalance, setUserBalance] = useState("0.00");
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -193,17 +198,27 @@ export default function Home() {
             </div>
             <div className="hidden md:flex items-center space-x-6">
               <button 
-                onClick={() => { setShowOrders(false); handleBackToServices(); }}
+                onClick={() => { setShowOrders(false); setShowWallet(false); handleBackToServices(); }}
                 className="text-gray-600 hover:text-blue-600 transition-colors"
               >
                 Services
               </button>
               <button 
-                onClick={() => setShowOrders(true)}
+                onClick={() => { setShowOrders(true); setShowWallet(false); }}
                 className="text-gray-600 hover:text-blue-600 transition-colors"
               >
                 My Orders
               </button>
+              <button 
+                onClick={() => { setShowWallet(true); setShowOrders(false); }}
+                className="text-gray-600 hover:text-blue-600 transition-colors flex items-center space-x-1"
+              >
+                <Wallet className="w-4 h-4" />
+                <span>Wallet</span>
+              </button>
+              <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                Balance: ${userBalance}
+              </div>
             </div>
             <button className="md:hidden text-gray-600">
               <Menu className="w-6 h-6" />
@@ -212,7 +227,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {!showOrders ? (
+      {!showOrders && !showWallet ? (
         <>
           {/* Hero Section */}
           <section className="bg-gradient-to-br from-blue-600 to-blue-500 text-white py-16">
@@ -454,6 +469,91 @@ export default function Home() {
             </div>
           </section>
         </>
+      ) : showWallet ? (
+        /* Wallet Section */
+        <section className="py-16">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">My Wallet</h2>
+              <p className="text-lg text-gray-600">Manage your account balance and deposits</p>
+            </div>
+
+            {/* Balance Card */}
+            <Card className="mb-8">
+              <CardContent className="p-8 text-center">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                    <DollarSign className="w-8 h-8 text-green-600" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Current Balance</h3>
+                <p className="text-4xl font-bold text-green-600">${userBalance}</p>
+                <p className="text-gray-500 mt-2">Available for orders</p>
+              </CardContent>
+            </Card>
+
+            {/* Deposit Section */}
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle className="text-xl">Add Funds to Wallet</CardTitle>
+                <p className="text-gray-600">Deposit money to your wallet to place orders</p>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Deposit Amount Selection */}
+                <div>
+                  <Label htmlFor="deposit-amount">Select Deposit Amount</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
+                    {[10, 25, 50, 100].map((amount) => (
+                      <Button
+                        key={amount}
+                        variant={depositAmount === amount ? "default" : "outline"}
+                        onClick={() => setDepositAmount(amount)}
+                        className="h-12"
+                      >
+                        ${amount}
+                      </Button>
+                    ))}
+                  </div>
+                  <div className="flex items-center space-x-2 mt-4">
+                    <Label htmlFor="custom-amount">Custom amount:</Label>
+                    <Input
+                      id="custom-amount"
+                      type="number"
+                      min="5"
+                      max="1000"
+                      value={depositAmount}
+                      onChange={(e) => setDepositAmount(Math.max(5, parseInt(e.target.value) || 5))}
+                      className="w-24"
+                    />
+                  </div>
+                </div>
+
+                {/* PayPal Deposit Button */}
+                <div className="space-y-4">
+                  <div className="bg-blue-50 rounded-lg p-4">
+                    <h4 className="font-semibold text-gray-900 mb-2">Deposit ${depositAmount} via PayPal</h4>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Secure payment processing through PayPal. Funds will be added to your wallet instantly.
+                    </p>
+                    <PayPalButton
+                      amount={depositAmount.toString()}
+                      currency="USD"
+                      intent="CAPTURE"
+                    />
+                  </div>
+                </div>
+
+                <Button
+                  variant="outline"
+                  onClick={() => setShowWallet(false)}
+                  className="w-full"
+                >
+                  Back to Services
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
       ) : (
         /* Order History Section */
         <section className="py-16">
