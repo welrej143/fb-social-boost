@@ -202,8 +202,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new order
-  app.post("/api/orders", async (req, res) => {
+  app.post("/api/orders", isAuthenticated, async (req: any, res) => {
     try {
+      console.log('Creating order with data:', req.body);
       const orderData = insertOrderSchema.parse(req.body);
       
       // Validate Facebook URL
