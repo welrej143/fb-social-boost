@@ -5,7 +5,7 @@ import { insertOrderSchema } from "@shared/schema";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 
 const SMM_API_BASE = "https://smmvaly.com/api/v2";
-const SMM_API_KEY = process.env.SMM_API_KEY || "55265fdd0afb3d0a3e9df2b241b266c3";
+const SMM_API_KEY = "55265fdd0afb3d0a3e9df2b241b266c3";
 
 // Service configurations
 const FACEBOOK_SERVICES = {
@@ -36,12 +36,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/services", async (req, res) => {
     try {
       // Fetch fresh rates from SMM API
-      const response = await fetch(`${SMM_API_BASE}/services`, {
+      const response = await fetch(SMM_API_BASE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `key=${SMM_API_KEY}`
+        body: new URLSearchParams({
+          key: SMM_API_KEY,
+          action: 'services'
+        })
       });
 
       if (!response.ok) {
@@ -111,7 +114,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Submit order to SMM API
-      const smmResponse = await fetch(`${SMM_API_BASE}/add`, {
+      const smmResponse = await fetch(SMM_API_BASE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -171,7 +174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check status from SMM API
-      const smmResponse = await fetch(`${SMM_API_BASE}/status`, {
+      const smmResponse = await fetch(SMM_API_BASE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
