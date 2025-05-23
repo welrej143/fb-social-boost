@@ -39,12 +39,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Hash password and create user
       const hashedPassword = await hashPassword(validatedData.password);
+      console.log('About to create user with:', {
+        email: validatedData.email,
+        username: validatedData.email,
+        password: '[HIDDEN]',
+        firstName: validatedData.firstName,
+        lastName: validatedData.lastName,
+      });
       const user = await storage.createUser({
         email: validatedData.email,
         username: validatedData.email, // Use email as username
         password: hashedPassword,
-        firstName: validatedData.firstName || null,
-        lastName: validatedData.lastName || null,
+        firstName: validatedData.firstName || undefined,
+        lastName: validatedData.lastName || undefined,
       });
 
       // Create session

@@ -4,12 +4,14 @@ import { z } from "zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  email: varchar("email").notNull().unique(),
-  password: varchar("password").notNull(),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
+  username: text("username").notNull(),
+  password: text("password").notNull(),
   balance: text("balance").notNull().default("0.00"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
