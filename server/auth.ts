@@ -13,8 +13,8 @@ declare module "express-session" {
 export function getSession() {
   return session({
     secret: process.env.SESSION_SECRET || "facebook-boost-secret-key-2024",
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
     cookie: {
       httpOnly: true,
       secure: false, // Set to true in production with HTTPS

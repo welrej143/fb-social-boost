@@ -259,35 +259,13 @@ export default function Home() {
               )}
               
               {isAuthenticated ? (
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2 bg-green-50 px-3 py-1 rounded-lg border border-green-200">
-                    <Wallet className="w-4 h-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-700">
-                      Balance: ${user?.balance || '0.00'}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <User className="w-4 h-4 text-gray-600" />
-                    <span className="text-sm text-gray-600">{user?.email || 'User'}</span>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={async () => {
-                      try {
-                        await apiRequest('/api/logout', 'POST');
-                        queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
-                        window.location.reload();
-                      } catch (error) {
-                        console.error('Logout error:', error);
-                      }
-                    }}
-                    className="flex items-center space-x-1"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>Logout</span>
-                  </Button>
-                </div>
+                <Button
+                  onClick={() => window.location.href = '/account'}
+                  className="flex items-center space-x-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  <User className="w-4 h-4" />
+                  <span>My Account</span>
+                </Button>
               ) : (
                 <Button
                   onClick={() => window.location.href = '/login'}
