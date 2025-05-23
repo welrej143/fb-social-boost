@@ -48,7 +48,10 @@ export default function Login() {
         description: "Welcome to Facebook Boost Pro",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      window.location.href = "/";
+      // Small delay to ensure session is set
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 500);
     },
     onError: (error: any) => {
       toast({

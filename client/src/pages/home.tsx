@@ -259,7 +259,13 @@ export default function Home() {
               )}
               
               {isAuthenticated ? (
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2 bg-green-50 px-3 py-1 rounded-lg border border-green-200">
+                    <Wallet className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-medium text-green-700">
+                      Balance: ${user?.balance || '0.00'}
+                    </span>
+                  </div>
                   <div className="flex items-center space-x-2">
                     <User className="w-4 h-4 text-gray-600" />
                     <span className="text-sm text-gray-600">{user?.email || 'User'}</span>
