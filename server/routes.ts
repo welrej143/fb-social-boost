@@ -20,15 +20,15 @@ const FACEBOOK_SERVICES = {
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // PayPal routes
-  app.get("/api/paypal/setup", async (req, res) => {
+  app.get("/paypal/setup", async (req, res) => {
     await loadPaypalDefault(req, res);
   });
 
-  app.post("/api/paypal/order", async (req, res) => {
+  app.post("/paypal/order", async (req, res) => {
     await createPaypalOrder(req, res);
   });
 
-  app.post("/api/paypal/order/:orderID/capture", async (req, res) => {
+  app.post("/paypal/order/:orderID/capture", async (req, res) => {
     await capturePaypalOrder(req, res);
   });
 
