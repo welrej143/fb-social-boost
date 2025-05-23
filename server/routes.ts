@@ -1,8 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertOrderSchema, insertDepositSchema } from "@shared/schema";
+import { getSession, isAuthenticated, hashPassword, comparePassword } from "./auth";
+import { insertOrderSchema, insertDepositSchema, insertUserSchema, loginSchema } from "@shared/schema";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 
 const SMM_API_BASE = "https://smmvaly.com/api/v2";
@@ -19,13 +19,79 @@ const FACEBOOK_SERVICES = {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
+  // Session middleware
+  app.use(getSession());
 
   // Auth routes
+  app.post('/api/register', async (req, res) => {
+    try {
+      const validatedData = insertUserSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(validatedData.email);
+      if (existingUser) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+
+      // Hash password and create user
+      const hashedPassword = await hashPassword(validatedData.password);
+      const user = await storage.createUser({
+        email: validatedData.email,
+        password: hashedPassword,
+        firstName: validatedData.firstName || null,
+        lastName: validatedData.lastName || null,
+      });
+
+      // Create session
+      req.session.userId = user.id;
+      req.session.userEmail = user.email;
+
+      res.json({ message: "User created successfully", user: { id: user.id, email: user.email } });
+    } catch (error) {
+      console.error("Registration error:", error);
+      res.status(400).json({ message: "Registration failed" });
+    }
+  });
+
+  app.post('/api/login', async (req, res) => {
+    try {
+      const validatedData = loginSchema.parse(req.body);
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(validatedData.email);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      // Check password
+      const isValidPassword = await comparePassword(validatedData.password, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      // Create session
+      req.session.userId = user.id;
+      req.session.userEmail = user.email;
+
+      res.json({ message: "Login successful", user: { id: user.id, email: user.email } });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(400).json({ message: "Login failed" });
+    }
+  });
+
+  app.post('/api/logout', (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Logout failed" });
+      }
+      res.json({ message: "Logout successful" });
+    });
+  });
+
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.session.userId;
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
