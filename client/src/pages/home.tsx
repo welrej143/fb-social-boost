@@ -553,6 +553,7 @@ export default function Home() {
                       Secure payment processing through PayPal. Funds will be added to your wallet instantly.
                     </p>
                     <PayPalButton
+                      key={depositAmount}
                       amount={depositAmount.toString()}
                       currency="USD"
                       intent="CAPTURE"
