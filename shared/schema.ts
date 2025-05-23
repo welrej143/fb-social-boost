@@ -76,7 +76,7 @@ export const insertDepositSchema = createInsertSchema(deposits).omit({
   createdAt: true,
 });
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
+export type InsertUser = z.infer<typeof upsertUserSchema>;
 export type User = typeof users.$inferSelect;
 
 export type InsertService = z.infer<typeof insertServiceSchema>;

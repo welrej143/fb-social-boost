@@ -37,126 +37,115 @@ export interface IStorage {
   getUserDeposits(userId: string): Promise<Deposit[]>;
 }
 
-// Database storage implementation
-export class DbStorage implements IStorage {
-  private db;
-
-  constructor() {
-    const connectionString = process.env.DATABASE_URL;
-    if (!connectionString) {
-      throw new Error("DATABASE_URL is required");
-    }
-    
-    const sql = postgres(connectionString);
-    this.db = drizzle(sql);
+export class DatabaseStorage implements IStorage {
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
-  async getUser(id: number): Promise<User | undefined> {
-    const result = await this.db.select().from(users).where(eq(users.id, id));
-    return result[0];
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    const result = await this.db.select().from(users).where(eq(users.username, username));
-    return result[0];
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const result = await this.db.insert(users).values(insertUser).returning();
-    return result[0];
+  async updateUserBalance(userId: string, newBalance: string): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ balance: newBalance, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
   }
 
   async getService(serviceId: string): Promise<Service | undefined> {
-    const result = await this.db.select().from(services).where(eq(services.serviceId, serviceId));
-    return result[0];
+    const [service] = await db.select().from(services).where(eq(services.serviceId, serviceId));
+    return service;
   }
 
   async getAllServices(): Promise<Service[]> {
-    return await this.db.select().from(services);
+    return await db.select().from(services);
   }
 
   async createOrUpdateService(insertService: InsertService): Promise<Service> {
-    const existing = await this.getService(insertService.serviceId);
-    
-    if (existing) {
-      const result = await this.db
-        .update(services)
-        .set({ ...insertService, updatedAt: new Date() })
-        .where(eq(services.serviceId, insertService.serviceId))
-        .returning();
-      return result[0];
-    } else {
-      const result = await this.db.insert(services).values(insertService).returning();
-      return result[0];
-    }
+    const [service] = await db
+      .insert(services)
+      .values(insertService)
+      .onConflictDoUpdate({
+        target: services.serviceId,
+        set: {
+          name: insertService.name,
+          rate: insertService.rate,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return service;
   }
 
   async getOrder(orderId: string): Promise<Order | undefined> {
-    const result = await this.db.select().from(orders).where(eq(orders.orderId, orderId));
-    return result[0];
+    const [order] = await db.select().from(orders).where(eq(orders.orderId, orderId));
+    return order;
   }
 
-  async getAllOrders(): Promise<Order[]> {
-    return await this.db.select().from(orders).orderBy(orders.createdAt);
+  async getUserOrders(userId: string): Promise<Order[]> {
+    return await db.select().from(orders).where(eq(orders.userId, userId));
   }
 
   async createOrder(insertOrder: InsertOrder): Promise<Order> {
-    const result = await this.db.insert(orders).values({
-      ...insertOrder,
-      status: insertOrder.status || "Processing"
-    }).returning();
-    return result[0];
+    const [order] = await db.insert(orders).values(insertOrder).returning();
+    return order;
   }
 
   async updateOrderStatus(orderId: string, status: string): Promise<Order | undefined> {
-    const result = await this.db
+    const [order] = await db
       .update(orders)
       .set({ status })
       .where(eq(orders.orderId, orderId))
       .returning();
-    return result[0];
+    return order;
   }
 
   async updateOrderSmmId(orderId: string, smmOrderId: string): Promise<Order | undefined> {
-    const result = await this.db
+    const [order] = await db
       .update(orders)
       .set({ smmOrderId })
       .where(eq(orders.orderId, orderId))
       .returning();
-    return result[0];
-  }
-
-  async updateUserBalance(userId: number, newBalance: string): Promise<User | undefined> {
-    const result = await this.db
-      .update(users)
-      .set({ balance: newBalance })
-      .where(eq(users.id, userId))
-      .returning();
-    return result[0];
+    return order;
   }
 
   async createDeposit(insertDeposit: InsertDeposit): Promise<Deposit> {
-    const result = await this.db.insert(deposits).values(insertDeposit).returning();
-    return result[0];
+    const [deposit] = await db.insert(deposits).values(insertDeposit).returning();
+    return deposit;
   }
 
   async getDeposit(id: number): Promise<Deposit | undefined> {
-    const result = await this.db.select().from(deposits).where(eq(deposits.id, id));
-    return result[0];
+    const [deposit] = await db.select().from(deposits).where(eq(deposits.id, id));
+    return deposit;
   }
 
   async updateDepositStatus(id: number, status: string): Promise<Deposit | undefined> {
-    const result = await this.db
+    const [deposit] = await db
       .update(deposits)
       .set({ status })
       .where(eq(deposits.id, id))
       .returning();
-    return result[0];
+    return deposit;
   }
 
-  async getUserDeposits(userId: number): Promise<Deposit[]> {
-    return await this.db.select().from(deposits).where(eq(deposits.userId, userId));
+  async getUserDeposits(userId: string): Promise<Deposit[]> {
+    return await db.select().from(deposits).where(eq(deposits.userId, userId));
   }
 }
 
-export const storage = new DbStorage();
+export const storage = new DatabaseStorage();
