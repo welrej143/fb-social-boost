@@ -1,0 +1,251 @@
+import type { Express } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+import { insertOrderSchema } from "@shared/schema";
+import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
+
+const SMM_API_BASE = "https://smmvaly.com/api/v2";
+const SMM_API_KEY = process.env.SMM_API_KEY || "55265fdd0afb3d0a3e9df2b241b266c3";
+
+// Service configurations
+const FACEBOOK_SERVICES = {
+  "1977": "Facebook Page Likes",
+  "1775": "Facebook Page Followers", 
+  "55": "Facebook Profile Followers",
+  "221": "Facebook Post Likes",
+  "1779": "Facebook Post Reactions",
+  "254": "Facebook Video Views"
+};
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // PayPal routes
+  app.get("/api/paypal/setup", async (req, res) => {
+    await loadPaypalDefault(req, res);
+  });
+
+  app.post("/api/paypal/order", async (req, res) => {
+    await createPaypalOrder(req, res);
+  });
+
+  app.post("/api/paypal/order/:orderID/capture", async (req, res) => {
+    await capturePaypalOrder(req, res);
+  });
+
+  // Get all services with current rates
+  app.get("/api/services", async (req, res) => {
+    try {
+      // Fetch fresh rates from SMM API
+      const response = await fetch(`${SMM_API_BASE}/services`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `key=${SMM_API_KEY}`
+      });
+
+      if (!response.ok) {
+        throw new Error(`SMM API error: ${response.status}`);
+      }
+
+      const smmServices = await response.json();
+      const facebookServices = [];
+
+      // Process each Facebook service
+      for (const [serviceId, serviceName] of Object.entries(FACEBOOK_SERVICES)) {
+        const smmService = smmServices.find((s: any) => s.service === serviceId);
+        
+        if (smmService) {
+          // Calculate our rate (SMM rate * 5 for profit)
+          const ourRate = (parseFloat(smmService.rate) * 5).toFixed(2);
+          
+          // Store/update in our storage
+          await storage.createOrUpdateService({
+            serviceId,
+            name: serviceName,
+            rate: ourRate
+          });
+
+          facebookServices.push({
+            serviceId,
+            name: serviceName,
+            rate: ourRate,
+            originalRate: smmService.rate,
+            minOrder: smmService.min || 100,
+            maxOrder: smmService.max || 100000
+          });
+        } else {
+          facebookServices.push({
+            serviceId,
+            name: serviceName,
+            rate: "N/A",
+            originalRate: "N/A",
+            minOrder: 1000,
+            maxOrder: 100000
+          });
+        }
+      }
+
+      res.json(facebookServices);
+    } catch (error) {
+      console.error("Error fetching services:", error);
+      res.status(500).json({ error: "Failed to fetch services" });
+    }
+  });
+
+  // Create new order
+  app.post("/api/orders", async (req, res) => {
+    try {
+      const orderData = insertOrderSchema.parse(req.body);
+      
+      // Validate Facebook URL
+      const facebookUrlPattern = /^https?:\/\/(www\.)?(facebook|fb)\.com\/.+/i;
+      if (!facebookUrlPattern.test(orderData.link)) {
+        return res.status(400).json({ error: "Invalid Facebook URL" });
+      }
+
+      // Validate service exists
+      const service = await storage.getService(orderData.serviceId);
+      if (!service) {
+        return res.status(400).json({ error: "Invalid service" });
+      }
+
+      // Submit order to SMM API
+      const smmResponse = await fetch(`${SMM_API_BASE}/add`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          key: SMM_API_KEY,
+          action: 'add',
+          service: orderData.serviceId,
+          link: orderData.link,
+          quantity: orderData.quantity.toString()
+        })
+      });
+
+      if (!smmResponse.ok) {
+        throw new Error(`SMM API error: ${smmResponse.status}`);
+      }
+
+      const smmResult = await smmResponse.json();
+
+      if (smmResult.order) {
+        // Create order in our storage
+        const order = await storage.createOrder({
+          ...orderData,
+          orderId: smmResult.order.toString(),
+          status: "Processing"
+        });
+
+        res.json({ 
+          success: true, 
+          order: {
+            id: order.orderId,
+            status: order.status,
+            service: order.serviceName,
+            quantity: order.quantity,
+            amount: order.amount
+          }
+        });
+      } else {
+        throw new Error(smmResult.error || "Order submission failed");
+      }
+    } catch (error) {
+      console.error("Order creation error:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to create order" 
+      });
+    }
+  });
+
+  // Get order status
+  app.get("/api/orders/:orderId", async (req, res) => {
+    try {
+      const { orderId } = req.params;
+      const order = await storage.getOrder(orderId);
+      
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+
+      // Check status from SMM API
+      const smmResponse = await fetch(`${SMM_API_BASE}/status`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          key: SMM_API_KEY,
+          action: 'status',
+          order: orderId
+        })
+      });
+
+      if (smmResponse.ok) {
+        const smmResult = await smmResponse.json();
+        if (smmResult.status) {
+          // Update local status if different
+          if (smmResult.status !== order.status) {
+            await storage.updateOrderStatus(orderId, smmResult.status);
+          }
+          
+          res.json({
+            ...order,
+            status: smmResult.status,
+            charge: smmResult.charge || order.amount,
+            startCount: smmResult.start_count || 0,
+            remains: smmResult.remains || order.quantity
+          });
+          return;
+        }
+      }
+
+      // Return local order data if SMM API fails
+      res.json(order);
+    } catch (error) {
+      console.error("Error fetching order status:", error);
+      res.status(500).json({ error: "Failed to fetch order status" });
+    }
+  });
+
+  // Get all orders
+  app.get("/api/orders", async (req, res) => {
+    try {
+      const orders = await storage.getAllOrders();
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      res.status(500).json({ error: "Failed to fetch orders" });
+    }
+  });
+
+  // Update order after PayPal payment
+  app.post("/api/orders/:orderId/payment", async (req, res) => {
+    try {
+      const { orderId } = req.params;
+      const { paypalOrderId, status } = req.body;
+      
+      const order = await storage.getOrder(orderId);
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+
+      // Update order with PayPal info
+      const updatedOrder = await storage.createOrder({
+        ...order,
+        paypalOrderId,
+        status: status || "Paid"
+      });
+
+      res.json({ success: true, order: updatedOrder });
+    } catch (error) {
+      console.error("Error updating order payment:", error);
+      res.status(500).json({ error: "Failed to update payment" });
+    }
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
+}
