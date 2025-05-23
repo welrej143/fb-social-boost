@@ -93,6 +93,13 @@ export default function Home() {
   const queryClient = useQueryClient();
   const { user, isAuthenticated, isLoading } = useAuth();
 
+  // Update user balance when user data changes
+  useEffect(() => {
+    if (user?.balance) {
+      setUserBalance(user.balance);
+    }
+  }, [user]);
+
   // Fetch services
   const { data: services = [], isLoading: servicesLoading } = useQuery<Service[]>({
     queryKey: ["/api/services"],
