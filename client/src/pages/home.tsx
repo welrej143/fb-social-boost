@@ -130,6 +130,15 @@ export default function Home() {
   });
 
   const handleServiceSelect = (service: Service) => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Login Required",
+        description: "Please login first to place an order for Facebook services",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (service.rate === "N/A") {
       toast({
         title: "Service Unavailable",
