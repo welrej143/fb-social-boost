@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 import PayPalButton from "@/components/PayPalButton";
 import { 
   Facebook, 
@@ -24,7 +25,10 @@ import {
   Minus,
   Plus,
   Wallet,
-  DollarSign
+  DollarSign,
+  LogIn,
+  LogOut,
+  User
 } from "lucide-react";
 
 interface Service {
@@ -87,6 +91,7 @@ export default function Home() {
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   // Fetch services
   const { data: services = [], isLoading: servicesLoading } = useQuery<Service[]>({
@@ -204,21 +209,71 @@ export default function Home() {
                 Services
               </button>
               <button 
-                onClick={() => { setShowOrders(true); setShowWallet(false); }}
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    toast({
+                      title: "Login Required",
+                      description: "Please login first to view your orders",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  setShowOrders(true); 
+                  setShowWallet(false);
+                }}
                 className="text-gray-600 hover:text-blue-600 transition-colors"
               >
                 My Orders
               </button>
               <button 
-                onClick={() => { setShowWallet(true); setShowOrders(false); }}
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    toast({
+                      title: "Login Required", 
+                      description: "Please login first to access your wallet",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  setShowWallet(true); 
+                  setShowOrders(false);
+                }}
                 className="text-gray-600 hover:text-blue-600 transition-colors flex items-center space-x-1"
               >
                 <Wallet className="w-4 h-4" />
                 <span>Wallet</span>
               </button>
-              <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
-                Balance: ${userBalance}
-              </div>
+              {isAuthenticated && (
+                <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                  Balance: ${userBalance}
+                </div>
+              )}
+              
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
+                    <User className="w-4 h-4 text-gray-600" />
+                    <span className="text-sm text-gray-600">{user?.email || 'User'}</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.location.href = '/api/logout'}
+                    className="flex items-center space-x-1"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Logout</span>
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  onClick={() => window.location.href = '/api/login'}
+                  className="flex items-center space-x-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Login</span>
+                </Button>
+              )}
             </div>
             <button className="md:hidden text-gray-600">
               <Menu className="w-6 h-6" />
