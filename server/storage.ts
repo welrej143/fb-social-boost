@@ -1,4 +1,7 @@
 import { users, services, orders, type User, type InsertUser, type Service, type InsertService, type Order, type InsertOrder } from "@shared/schema";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -15,101 +18,85 @@ export interface IStorage {
   updateOrderStatus(orderId: string, status: string): Promise<Order | undefined>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private services: Map<string, Service>;
-  private orders: Map<string, Order>;
-  private currentUserId: number;
-  private currentServiceId: number;
-  private currentOrderId: number;
+// Database storage implementation
+export class DbStorage implements IStorage {
+  private db;
 
   constructor() {
-    this.users = new Map();
-    this.services = new Map();
-    this.orders = new Map();
-    this.currentUserId = 1;
-    this.currentServiceId = 1;
-    this.currentOrderId = 1;
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error("DATABASE_URL is required");
+    }
+    
+    const sql = postgres(connectionString);
+    this.db = drizzle(sql);
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const result = await this.db.select().from(users).where(eq(users.id, id));
+    return result[0];
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const result = await this.db.select().from(users).where(eq(users.username, username));
+    return result[0];
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+    const result = await this.db.insert(users).values(insertUser).returning();
+    return result[0];
   }
 
   async getService(serviceId: string): Promise<Service | undefined> {
-    return this.services.get(serviceId);
+    const result = await this.db.select().from(services).where(eq(services.serviceId, serviceId));
+    return result[0];
   }
 
   async getAllServices(): Promise<Service[]> {
-    return Array.from(this.services.values());
+    return await this.db.select().from(services);
   }
 
   async createOrUpdateService(insertService: InsertService): Promise<Service> {
-    const existing = this.services.get(insertService.serviceId);
+    const existing = await this.getService(insertService.serviceId);
     
     if (existing) {
-      const updated: Service = {
-        ...existing,
-        ...insertService,
-        updatedAt: new Date(),
-      };
-      this.services.set(insertService.serviceId, updated);
-      return updated;
+      const result = await this.db
+        .update(services)
+        .set({ ...insertService, updatedAt: new Date() })
+        .where(eq(services.serviceId, insertService.serviceId))
+        .returning();
+      return result[0];
     } else {
-      const id = this.currentServiceId++;
-      const service: Service = {
-        id,
-        ...insertService,
-        updatedAt: new Date(),
-      };
-      this.services.set(insertService.serviceId, service);
-      return service;
+      const result = await this.db.insert(services).values(insertService).returning();
+      return result[0];
     }
   }
 
   async getOrder(orderId: string): Promise<Order | undefined> {
-    return this.orders.get(orderId);
+    const result = await this.db.select().from(orders).where(eq(orders.orderId, orderId));
+    return result[0];
   }
 
   async getAllOrders(): Promise<Order[]> {
-    return Array.from(this.orders.values()).sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-    );
+    return await this.db.select().from(orders).orderBy(orders.createdAt);
   }
 
   async createOrder(insertOrder: InsertOrder): Promise<Order> {
-    const id = this.currentOrderId++;
-    const order: Order = {
-      id,
+    const result = await this.db.insert(orders).values({
       ...insertOrder,
-      createdAt: new Date(),
-    };
-    this.orders.set(insertOrder.orderId, order);
-    return order;
+      status: insertOrder.status || "Processing"
+    }).returning();
+    return result[0];
   }
 
   async updateOrderStatus(orderId: string, status: string): Promise<Order | undefined> {
-    const order = this.orders.get(orderId);
-    if (order) {
-      const updated = { ...order, status };
-      this.orders.set(orderId, updated);
-      return updated;
-    }
-    return undefined;
+    const result = await this.db
+      .update(orders)
+      .set({ status })
+      .where(eq(orders.orderId, orderId))
+      .returning();
+    return result[0];
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DbStorage();
