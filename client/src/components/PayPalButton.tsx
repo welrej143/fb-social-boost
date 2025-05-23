@@ -61,6 +61,28 @@ export default function PayPalButton({
     console.log("onApprove", data);
     const orderData = await captureOrder(data.orderId);
     console.log("Capture result", orderData);
+    
+    // After successful PayPal payment, notify our server to submit to SMM API
+    if (orderData && orderData.status === "COMPLETED") {
+      try {
+        const response = await fetch(`/api/orders/${window.currentOrderId}/payment`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paypalOrderId: data.orderId })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          console.log("Order submitted to SMM API successfully");
+          // Redirect or show success message
+          window.location.reload();
+        } else {
+          console.error("Failed to submit order:", result.error);
+        }
+      } catch (error) {
+        console.error("Error confirming payment:", error);
+      }
+    }
   };
 
   const onCancel = async (data: any) => {

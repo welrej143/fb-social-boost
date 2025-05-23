@@ -96,7 +96,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create new order
+  // Create new order (before payment)
   app.post("/api/orders", async (req, res) => {
     try {
       const orderData = insertOrderSchema.parse(req.body);
@@ -113,48 +113,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid service" });
       }
 
-      // Submit order to SMM API
-      const smmResponse = await fetch(SMM_API_BASE, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          key: SMM_API_KEY,
-          action: 'add',
-          service: orderData.serviceId,
-          link: orderData.link,
-          quantity: orderData.quantity.toString()
-        })
+      // Create order in our storage with "Pending Payment" status
+      // DO NOT submit to SMM API yet - wait for payment confirmation
+      const order = await storage.createOrder({
+        ...orderData,
+        status: "Pending Payment"
       });
 
-      if (!smmResponse.ok) {
-        throw new Error(`SMM API error: ${smmResponse.status}`);
-      }
-
-      const smmResult = await smmResponse.json();
-
-      if (smmResult.order) {
-        // Create order in our storage
-        const order = await storage.createOrder({
-          ...orderData,
-          orderId: smmResult.order.toString(),
-          status: "Processing"
-        });
-
-        res.json({ 
-          success: true, 
-          order: {
-            id: order.orderId,
-            status: order.status,
-            service: order.serviceName,
-            quantity: order.quantity,
-            amount: order.amount
-          }
-        });
-      } else {
-        throw new Error(smmResult.error || "Order submission failed");
-      }
+      res.json({ 
+        success: true, 
+        order: {
+          id: order.orderId,
+          status: order.status,
+          service: order.serviceName,
+          quantity: order.quantity,
+          amount: order.amount
+        }
+      });
     } catch (error) {
       console.error("Order creation error:", error);
       res.status(500).json({ 
@@ -224,28 +199,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update order after PayPal payment
+  // Process payment and submit to SMM API
   app.post("/api/orders/:orderId/payment", async (req, res) => {
     try {
       const { orderId } = req.params;
-      const { paypalOrderId, status } = req.body;
+      const { paypalOrderId } = req.body;
       
       const order = await storage.getOrder(orderId);
       if (!order) {
         return res.status(404).json({ error: "Order not found" });
       }
 
-      // Update order with PayPal info
-      const updatedOrder = await storage.createOrder({
-        ...order,
-        paypalOrderId,
-        status: status || "Paid"
+      if (order.status !== "Pending Payment") {
+        return res.status(400).json({ error: "Order already processed" });
+      }
+
+      // NOW submit to SMM API after payment confirmation
+      const smmResponse = await fetch(SMM_API_BASE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          key: SMM_API_KEY,
+          action: 'add',
+          service: order.serviceId,
+          link: order.link,
+          quantity: order.quantity.toString()
+        })
       });
 
-      res.json({ success: true, order: updatedOrder });
+      if (!smmResponse.ok) {
+        // Payment was successful but SMM API failed - mark as paid but needs manual processing
+        await storage.updateOrderStatus(orderId, "Paid - Manual Processing Required");
+        return res.status(500).json({ 
+          error: "Payment successful but service submission failed. Contact support.",
+          order: { ...order, status: "Paid - Manual Processing Required" }
+        });
+      }
+
+      const smmResult = await smmResponse.json();
+
+      if (smmResult.order) {
+        // Update order with SMM order ID and mark as processing
+        const updatedOrder = await storage.updateOrderStatus(orderId, "Processing");
+        
+        res.json({ 
+          success: true, 
+          order: {
+            ...updatedOrder,
+            paypalOrderId,
+            smmOrderId: smmResult.order.toString()
+          }
+        });
+      } else {
+        // Payment successful but SMM API returned error
+        await storage.updateOrderStatus(orderId, "Paid - Manual Processing Required");
+        res.status(500).json({ 
+          error: smmResult.error || "Service submission failed after payment. Contact support.",
+          order: { ...order, status: "Paid - Manual Processing Required" }
+        });
+      }
     } catch (error) {
-      console.error("Error updating order payment:", error);
-      res.status(500).json({ error: "Failed to update payment" });
+      console.error("Error processing payment:", error);
+      res.status(500).json({ error: "Failed to process payment" });
     }
   });
 
