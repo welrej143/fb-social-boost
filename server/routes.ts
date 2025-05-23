@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import express from "express";
 import { storage } from "./storage";
 import { getSession, isAuthenticated, hashPassword, comparePassword } from "./auth";
 import { insertOrderSchema, insertDepositSchema, insertUserSchema, loginSchema } from "@shared/schema";
@@ -21,6 +22,9 @@ const FACEBOOK_SERVICES = {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Session middleware
   app.use(getSession());
+  
+  // Add express.json middleware for parsing request bodies
+  app.use(require('express').json());
 
   // Auth routes
   app.post('/api/register', async (req, res) => {
@@ -46,7 +50,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.session.userId = user.id;
       req.session.userEmail = user.email;
 
-      res.json({ message: "User created successfully", user: { id: user.id, email: user.email } });
+      // Force session save
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.status(500).json({ message: "Session save failed" });
+        }
+        res.json({ message: "User created successfully", user: { id: user.id, email: user.email } });
+      });
     } catch (error) {
       console.error("Registration error:", error);
       res.status(400).json({ message: "Registration failed" });
@@ -73,7 +84,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.session.userId = user.id;
       req.session.userEmail = user.email;
 
-      res.json({ message: "Login successful", user: { id: user.id, email: user.email } });
+      // Force session save
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.status(500).json({ message: "Session save failed" });
+        }
+        res.json({ message: "Login successful", user: { id: user.id, email: user.email } });
+      });
     } catch (error) {
       console.error("Login error:", error);
       res.status(400).json({ message: "Login failed" });

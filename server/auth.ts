@@ -25,6 +25,7 @@ export function getSession() {
 }
 
 export const isAuthenticated: RequestHandler = (req, res, next) => {
+  console.log('Session check:', req.session?.userId); // Debug log
   if (req.session?.userId) {
     return next();
   }
