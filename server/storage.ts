@@ -4,7 +4,6 @@ import {
   orders, 
   deposits, 
   type User, 
-  type UpsertUser, 
   type Service, 
   type InsertService, 
   type Order, 
@@ -16,17 +15,18 @@ import { db } from "./db";
 import { eq } from "drizzle-orm";
 
 export interface IStorage {
-  // User operations for Replit Auth
-  getUser(id: string): Promise<User | undefined>;
-  upsertUser(user: UpsertUser): Promise<User>;
-  updateUserBalance(userId: string, newBalance: string): Promise<User | undefined>;
+  // User operations for email/password auth
+  getUser(id: number): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: { email: string; password: string; firstName?: string; lastName?: string }): Promise<User>;
+  updateUserBalance(userId: number, newBalance: string): Promise<User | undefined>;
   
   getService(serviceId: string): Promise<Service | undefined>;
   getAllServices(): Promise<Service[]>;
   createOrUpdateService(service: InsertService): Promise<Service>;
   
   getOrder(orderId: string): Promise<Order | undefined>;
-  getUserOrders(userId: string): Promise<Order[]>;
+  getUserOrders(userId: number): Promise<Order[]>;
   createOrder(order: InsertOrder): Promise<Order>;
   updateOrderStatus(orderId: string, status: string): Promise<Order | undefined>;
   updateOrderSmmId(orderId: string, smmOrderId: string): Promise<Order | undefined>;
@@ -34,31 +34,29 @@ export interface IStorage {
   createDeposit(deposit: InsertDeposit): Promise<Deposit>;
   getDeposit(id: number): Promise<Deposit | undefined>;
   updateDepositStatus(id: number, status: string): Promise<Deposit | undefined>;
-  getUserDeposits(userId: string): Promise<Deposit[]>;
+  getUserDeposits(userId: number): Promise<Deposit[]>;
 }
 
 export class DatabaseStorage implements IStorage {
-  async getUser(id: string): Promise<User | undefined> {
+  async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
   }
 
-  async upsertUser(userData: UpsertUser): Promise<User> {
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(userData: { email: string; password: string; firstName?: string; lastName?: string }): Promise<User> {
     const [user] = await db
       .insert(users)
       .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
       .returning();
     return user;
   }
 
-  async updateUserBalance(userId: string, newBalance: string): Promise<User | undefined> {
+  async updateUserBalance(userId: number, newBalance: string): Promise<User | undefined> {
     const [user] = await db
       .update(users)
       .set({ balance: newBalance, updatedAt: new Date() })
@@ -97,7 +95,7 @@ export class DatabaseStorage implements IStorage {
     return order;
   }
 
-  async getUserOrders(userId: string): Promise<Order[]> {
+  async getUserOrders(userId: number): Promise<Order[]> {
     return await db.select().from(orders).where(eq(orders.userId, userId));
   }
 
@@ -143,7 +141,7 @@ export class DatabaseStorage implements IStorage {
     return deposit;
   }
 
-  async getUserDeposits(userId: string): Promise<Deposit[]> {
+  async getUserDeposits(userId: number): Promise<Deposit[]> {
     return await db.select().from(deposits).where(eq(deposits.userId, userId));
   }
 }

@@ -2,26 +2,14 @@ import { pgTable, text, serial, integer, timestamp, varchar, jsonb, index } from
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Session storage table for Replit Auth
-export const sessions = pgTable(
-  "sessions",
-  {
-    sid: varchar("sid").primaryKey(),
-    sess: jsonb("sess").notNull(),
-    expire: timestamp("expire").notNull(),
-  },
-  (table) => [index("IDX_session_expire").on(table.expire)],
-);
-
-// User storage table for Replit Auth
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().notNull(),
-  email: varchar("email").unique(),
+  id: serial("id").primaryKey(),
+  email: varchar("email").notNull().unique(),
+  password: varchar("password").notNull(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
-  profileImageUrl: varchar("profile_image_url"),
   balance: text("balance").notNull().default("0.00"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
@@ -36,7 +24,7 @@ export const services = pgTable("services", {
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
   orderId: text("order_id").notNull().unique(),
-  userId: varchar("user_id").notNull(),
+  userId: integer("user_id").notNull(),
   serviceId: text("service_id").notNull(),
   serviceName: text("service_name").notNull(),
   link: text("link").notNull(),
@@ -50,16 +38,24 @@ export const orders = pgTable("orders", {
 
 export const deposits = pgTable("deposits", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull(),
+  userId: integer("user_id").notNull(),
   amount: text("amount").notNull(),
   status: text("status").notNull().default("Pending"),
   paypalOrderId: text("paypal_order_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const upsertUserSchema = createInsertSchema(users);
+export const insertUserSchema = createInsertSchema(users).pick({
+  email: true,
+  password: true,
+  firstName: true,
+  lastName: true,
+});
 
-export type UpsertUser = typeof users.$inferInsert;
+export const loginSchema = createInsertSchema(users).pick({
+  email: true,
+  password: true,
+});
 
 export const insertServiceSchema = createInsertSchema(services).omit({
   id: true,
@@ -76,7 +72,8 @@ export const insertDepositSchema = createInsertSchema(deposits).omit({
   createdAt: true,
 });
 
-export type InsertUser = z.infer<typeof upsertUserSchema>;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type LoginUser = z.infer<typeof loginSchema>;
 export type User = typeof users.$inferSelect;
 
 export type InsertService = z.infer<typeof insertServiceSchema>;
