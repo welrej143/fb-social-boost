@@ -12,21 +12,14 @@ declare module "express-session" {
 }
 
 export function getSession() {
-  const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    conString: process.env.DATABASE_URL,
-    createTableIfMissing: true,
-    ttl: 7 * 24 * 60 * 60, // 1 week in seconds
-  });
-
+  // Use memory store for development, will switch to PG store for production
   return session({
     secret: process.env.SESSION_SECRET || "facebook-boost-secret-key-2024",
-    store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
       sameSite: 'lax'
     },
