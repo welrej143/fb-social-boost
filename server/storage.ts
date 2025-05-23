@@ -1,20 +1,32 @@
-import { users, services, orders, deposits, type User, type InsertUser, type Service, type InsertService, type Order, type InsertOrder, type Deposit, type InsertDeposit } from "@shared/schema";
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { 
+  users, 
+  services, 
+  orders, 
+  deposits, 
+  type User, 
+  type UpsertUser, 
+  type Service, 
+  type InsertService, 
+  type Order, 
+  type InsertOrder, 
+  type Deposit, 
+  type InsertDeposit 
+} from "@shared/schema";
+import { db } from "./db";
 import { eq } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
-  updateUserBalance(userId: number, newBalance: string): Promise<User | undefined>;
+  // User operations for Replit Auth
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  updateUserBalance(userId: string, newBalance: string): Promise<User | undefined>;
   
   getService(serviceId: string): Promise<Service | undefined>;
   getAllServices(): Promise<Service[]>;
   createOrUpdateService(service: InsertService): Promise<Service>;
   
   getOrder(orderId: string): Promise<Order | undefined>;
-  getAllOrders(): Promise<Order[]>;
+  getUserOrders(userId: string): Promise<Order[]>;
   createOrder(order: InsertOrder): Promise<Order>;
   updateOrderStatus(orderId: string, status: string): Promise<Order | undefined>;
   updateOrderSmmId(orderId: string, smmOrderId: string): Promise<Order | undefined>;
@@ -22,7 +34,7 @@ export interface IStorage {
   createDeposit(deposit: InsertDeposit): Promise<Deposit>;
   getDeposit(id: number): Promise<Deposit | undefined>;
   updateDepositStatus(id: number, status: string): Promise<Deposit | undefined>;
-  getUserDeposits(userId: number): Promise<Deposit[]>;
+  getUserDeposits(userId: string): Promise<Deposit[]>;
 }
 
 // Database storage implementation
