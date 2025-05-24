@@ -763,7 +763,9 @@ export default function Home() {
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between mb-4">
                         <div>
-                          <h4 className="font-semibold text-gray-900">Order #{order.orderId}</h4>
+                          <h4 className="font-semibold text-gray-900">
+                            Order #{order.smmOrderId || order.orderId}
+                          </h4>
                           <p className="text-sm text-gray-500">{order.serviceName}</p>
                         </div>
                         <Badge 
@@ -777,7 +779,7 @@ export default function Home() {
                           {order.status}
                         </Badge>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                         <div>
                           <span className="text-gray-500">Quantity:</span>
                           <div className="font-medium">{order.quantity.toLocaleString()}</div>
@@ -785,12 +787,6 @@ export default function Home() {
                         <div>
                           <span className="text-gray-500">Total:</span>
                           <div className="font-medium">${order.amount}</div>
-                        </div>
-                        <div>
-                          <span className="text-gray-500">SMM Order ID:</span>
-                          <div className="font-medium">
-                            {order.smmOrderId ? `#${order.smmOrderId}` : 'Pending'}
-                          </div>
                         </div>
                         <div>
                           <span className="text-gray-500">Date:</span>
