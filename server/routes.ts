@@ -184,18 +184,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Calculate our rate (SMM rate * 5 for profit)
           const ourRate = (parseFloat(smmService.rate) * 5).toFixed(2);
           
-          // Try to store/update in our storage (non-blocking)
-          try {
-            await storage.createOrUpdateService({
-              serviceId,
-              name: serviceName,
-              rate: ourRate
-            });
-          } catch (dbError) {
-            console.warn(`Failed to save service ${serviceId} to database:`, dbError);
-            // Continue anyway - don't let database errors break the API
-          }
-
           facebookServices.push({
             serviceId,
             name: serviceName,
@@ -203,6 +191,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
             originalRate: smmService.rate,
             minOrder: smmService.min || 100,
             maxOrder: smmService.max || 100000
+          });
+
+          // Try to store/update in our storage (non-blocking, fire-and-forget)
+          storage.createOrUpdateService({
+            serviceId,
+            name: serviceName,
+            rate: ourRate
+          }).catch(dbError => {
+            console.warn(`Failed to save service ${serviceId} to database:`, dbError);
           });
         } else {
           facebookServices.push({
