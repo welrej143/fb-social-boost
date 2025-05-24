@@ -362,6 +362,63 @@ export class MemStorage implements IStorage {
   async getUserDeposits(userId: number): Promise<Deposit[]> {
     return Array.from(this.deposits.values()).filter(deposit => deposit.userId === userId);
   }
+
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
 }
 
 export const storage = new MemStorage();
+
+// Initialize with test data for demo purposes
+async function initializeTestData() {
+  try {
+    // Create a test user
+    await storage.createUser({
+      email: "test@example.com",
+      username: "testuser",
+      password: "hashedpassword123",
+      firstName: "Test",
+      lastName: "User"
+    });
+
+    // Create another test user
+    await storage.createUser({
+      email: "demo@example.com", 
+      username: "demouser",
+      password: "hashedpassword456",
+      firstName: "Demo",
+      lastName: "User"
+    });
+
+    // Create some test orders
+    await storage.createOrder({
+      orderId: "ORD001",
+      userId: 1,
+      serviceId: "55",
+      serviceName: "Facebook Profile Followers",
+      quantity: 1000,
+      amount: "25.00",
+      link: "https://facebook.com/testprofile",
+      status: "completed"
+    });
+
+    await storage.createOrder({
+      orderId: "ORD002", 
+      userId: 2,
+      serviceId: "56",
+      serviceName: "Facebook Page Likes",
+      quantity: 500,
+      amount: "15.00",
+      link: "https://facebook.com/testpage",
+      status: "pending"
+    });
+
+    console.log("Test data initialized successfully!");
+  } catch (error) {
+    console.log("Test data already exists or error:", error);
+  }
+}
+
+// Initialize test data
+initializeTestData();
