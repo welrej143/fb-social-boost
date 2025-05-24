@@ -252,7 +252,8 @@ export default function Home() {
       link: facebookLink,
       quantity: quantity * 1000,
       amount: totalAmount,
-      status: "Pending Payment"
+      status: "Pending Payment",
+      userId: parseInt(user?.id || "0")
     });
   };
 

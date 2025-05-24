@@ -205,25 +205,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/orders", async (req: any, res) => {
     try {
       console.log('Creating order with data:', req.body);
-      console.log('Session data:', req.session);
-      console.log('Session userId:', req.session?.userId);
       
-      // Check if user is authenticated
-      if (!req.session?.userId) {
-        console.log('User not authenticated - no session userId');
-        return res.status(401).json({ error: "User not authenticated" });
-      }
-      
-      // Get userId from session
-      const userId = parseInt(req.session.userId);
-      
-      // Add userId to the order data
-      const orderDataWithUser = {
-        ...req.body,
-        userId: userId
-      };
-      
-      const orderData = insertOrderSchema.parse(orderDataWithUser);
+      // Validate the order data directly (userId should be included from frontend)
+      const orderData = insertOrderSchema.parse(req.body);
       
       // Validate Facebook URL
       const facebookUrlPattern = /^https?:\/\/(www\.)?(facebook|fb)\.com\/.+/i;
