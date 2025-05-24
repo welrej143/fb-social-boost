@@ -559,11 +559,21 @@ export default function Home() {
                                 🎉 Volume discount applied!
                               </div>
                             )}
-                            {quantity < 5000 && quantity >= 1000 && (
-                              <div className="text-xs text-gray-500 text-center">
-                                💡 Order 5,000+ for 5% discount!
+                            {/* Show discount tiers */}
+                            <div className="mt-2 p-2 bg-blue-50 rounded text-xs">
+                              <div className="font-medium text-blue-800 mb-1">💰 Volume Discounts:</div>
+                              <div className="space-y-1 text-blue-700">
+                                <div className={quantity >= 5000 && quantity < 10000 ? "font-bold" : ""}>
+                                  5,000-9,000: 5% off
+                                </div>
+                                <div className={quantity >= 10000 && quantity < 20000 ? "font-bold" : ""}>
+                                  10,000-19,000: 10% off
+                                </div>
+                                <div className={quantity >= 20000 ? "font-bold" : ""}>
+                                  20,000+: 15% off
+                                </div>
                               </div>
-                            )}
+                            </div>
                           </div>
                         </div>
 
