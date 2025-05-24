@@ -137,14 +137,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     await capturePaypalOrder(req, res);
   });
 
-  // Get all services with current rates
+  // Get all services with current rates (simplified version)
   app.get("/api/services", async (req, res) => {
     try {
-      console.log('Fetching services from SMM Valley API...');
-      console.log('API URL:', SMM_API_BASE);
-      console.log('API Key present:', !!SMM_API_KEY);
-      
-      // Fetch fresh rates from SMM API
+      // Return hardcoded Facebook services with live rates from SMM API
       const response = await fetch(SMM_API_BASE, {
         method: 'POST',
         headers: {
@@ -156,34 +152,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       });
 
-      console.log('SMM API response status:', response.status);
-
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('SMM API error response:', errorText);
-        throw new Error(`SMM API error: ${response.status} - ${errorText}`);
+        throw new Error(`SMM API error: ${response.status}`);
       }
 
       const smmServices = await response.json();
-      console.log('SMM API returned', Array.isArray(smmServices) ? smmServices.length : 'non-array', 'services');
-      console.log('First few services:', JSON.stringify(smmServices?.slice(0, 3), null, 2));
-      
-      // Check if our Facebook service IDs exist
-      const facebookServiceIds = Object.keys(FACEBOOK_SERVICES);
-      console.log('Looking for Facebook service IDs:', facebookServiceIds);
-      const foundServices = smmServices.filter((s: any) => facebookServiceIds.includes(s.service));
-      console.log('Found Facebook services:', foundServices.length);
-      foundServices.forEach((s: any) => console.log(`- Service ${s.service}: ${s.name}`));
       const facebookServices = [];
 
-      // Process each Facebook service
+      // Process each Facebook service quickly
       for (const [serviceId, serviceName] of Object.entries(FACEBOOK_SERVICES)) {
         const smmService = smmServices.find((s: any) => s.service === serviceId);
         
         if (smmService) {
-          // Calculate our rate (SMM rate * 5 for profit)
           const ourRate = (parseFloat(smmService.rate) * 5).toFixed(2);
-          
           facebookServices.push({
             serviceId,
             name: serviceName,
@@ -204,8 +185,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      console.log('Sending to frontend:', facebookServices.length, 'Facebook services');
-      console.log('Services data:', JSON.stringify(facebookServices, null, 2));
+      // Return immediately without any database operations
       res.json(facebookServices);
     } catch (error) {
       console.error("Error fetching services:", error);
