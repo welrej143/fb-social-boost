@@ -6,8 +6,8 @@ import { getSession, isAuthenticated, hashPassword, comparePassword } from "./au
 import { insertOrderSchema, insertDepositSchema, insertUserSchema, loginSchema } from "@shared/schema";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 
-const SMM_API_BASE = "https://smmvaly.com/api/v2";
-const SMM_API_KEY = "55265fdd0afb3d0a3e9df2b241b266c3";
+const SMM_API_BASE = process.env.SMM_API_URL || "https://smmvaly.com/api/v2";
+const SMM_API_KEY = process.env.SMM_API_KEY || "55265fdd0afb3d0a3e9df2b241b266c3";
 
 // Service configurations
 const FACEBOOK_SERVICES = {
