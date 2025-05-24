@@ -211,6 +211,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      console.log('Sending to frontend:', facebookServices.length, 'Facebook services');
+      console.log('Services data:', JSON.stringify(facebookServices, null, 2));
       res.json(facebookServices);
     } catch (error) {
       console.error("Error fetching services:", error);
