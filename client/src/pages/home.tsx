@@ -703,21 +703,21 @@ export default function Home() {
                     verified: true
                   }
                 ].map((review, index) => (
-                  <Card key={index} className="flex-shrink-0 w-80 bg-white border-gray-200 shadow-lg">
+                  <Card key={index} className="flex-shrink-0 w-80 bg-gradient-to-br from-blue-500 to-blue-700 border-none shadow-lg">
                     <CardContent className="p-6">
                       <div className="flex items-center mb-4">
-                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                          <span className="text-blue-600 font-semibold text-lg">
+                        <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-3 backdrop-blur-sm">
+                          <span className="text-white font-semibold text-lg">
                             {review.name.split(' ').map(n => n[0]).join('')}
                           </span>
                         </div>
                         <div>
-                          <h4 className="font-semibold text-gray-900">{review.name}</h4>
-                          <p className="text-sm text-gray-500">{review.service}</p>
+                          <h4 className="font-semibold text-white">{review.name}</h4>
+                          <p className="text-sm text-blue-100">{review.service}</p>
                         </div>
                         {review.verified && (
                           <div className="ml-auto">
-                            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                            <span className="bg-green-400 text-green-900 text-xs px-2 py-1 rounded-full font-medium">
                               Verified
                             </span>
                           </div>
@@ -728,7 +728,7 @@ export default function Home() {
                         {[...Array(5)].map((_, i) => (
                           <svg
                             key={i}
-                            className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                            className={`w-4 h-4 ${i < review.rating ? 'text-yellow-300' : 'text-blue-300'}`}
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -737,7 +737,7 @@ export default function Home() {
                         ))}
                       </div>
                       
-                      <p className="text-gray-700 text-sm leading-relaxed">{review.review}</p>
+                      <p className="text-blue-50 text-sm leading-relaxed">{review.review}</p>
                     </CardContent>
                   </Card>
                 ))}
