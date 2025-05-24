@@ -284,7 +284,7 @@ export default function Home() {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <Facebook className="w-4 h-4 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">SocialBoost</span>
+              <span className="text-xl font-bold text-gray-900">FB Social Boost</span>
             </div>
             <div className="hidden md:flex items-center space-x-6">
               <button 
@@ -910,7 +910,7 @@ export default function Home() {
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                   <Facebook className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-xl font-bold">SocialBoost</span>
+                <span className="text-xl font-bold">FB Social Boost</span>
               </div>
               <p className="text-gray-400 text-sm">
                 Professional Facebook growth services with guaranteed results and instant delivery.
@@ -947,7 +947,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-            <p>&copy; 2024 SocialBoost. All rights reserved.</p>
+            <p>&copy; 2024 FB Social Boost. All rights reserved.</p>
           </div>
         </div>
       </footer>

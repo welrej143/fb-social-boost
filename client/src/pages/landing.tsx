@@ -10,7 +10,7 @@ export default function Landing() {
         <div className="flex justify-between items-center mb-12">
           <div className="flex items-center space-x-2">
             <TrendingUp className="h-8 w-8 text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">Facebook Boost Pro</h1>
+            <h1 className="text-2xl font-bold text-gray-900">FB Social Boost</h1>
           </div>
           <Button 
             onClick={() => window.location.href = '/api/login'}
