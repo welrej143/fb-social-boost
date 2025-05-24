@@ -205,7 +205,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/orders", isAuthenticated, async (req: any, res) => {
     try {
       console.log('Creating order with data:', req.body);
-      const userId = req.session.userId;
+      const userId = parseInt(req.session.userId);
       
       // Add userId to the order data
       const orderDataWithUser = {
