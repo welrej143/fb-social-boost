@@ -29,27 +29,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.post('/api/register', async (req, res) => {
     try {
-      console.log('Registration request body:', req.body);
+      const validatedData = insertUserSchema.parse(req.body);
       
-      // Validate required fields first
-      if (!req.body.email || !req.body.password) {
+      // Validate required fields
+      if (!validatedData.email || !validatedData.password) {
         return res.status(400).json({ message: "Email and password are required" });
       }
 
       // Check if user already exists
-      const existingUser = await storage.getUserByEmail(req.body.email);
+      const existingUser = await storage.getUserByEmail(validatedData.email);
       if (existingUser) {
         return res.status(400).json({ message: "User already exists" });
       }
 
       // Hash password and create user
-      const hashedPassword = await hashPassword(req.body.password);
+      const hashedPassword = await hashPassword(validatedData.password);
       const user = await storage.createUser({
-        email: req.body.email,
-        username: req.body.email, // Use email as username
+        email: validatedData.email,
+        username: validatedData.email, // Use email as username
         password: hashedPassword,
-        firstName: req.body.firstName || undefined,
-        lastName: req.body.lastName || undefined,
+        firstName: validatedData.firstName ?? undefined,
+        lastName: validatedData.lastName ?? undefined,
       });
 
       // Create session
@@ -145,72 +145,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/paypal/order/:orderID/capture", async (req, res) => {
     await capturePaypalOrder(req, res);
-  });
-
-  // Admin routes
-  app.get("/api/admin/stats", async (req, res) => {
-    try {
-      const users = await storage.getAllUsers();
-      const orders = await storage.getAllOrders();
-      
-      const totalRevenue = orders
-        .filter(order => order.status === "completed")
-        .reduce((sum, order) => sum + parseFloat(order.amount), 0);
-      
-      const pendingOrders = orders.filter(order => order.status === "pending").length;
-      
-      res.json({
-        totalUsers: users.length,
-        totalOrders: orders.length,
-        totalRevenue: totalRevenue.toFixed(2),
-        pendingOrders
-      });
-    } catch (error) {
-      console.error("Error fetching admin stats:", error);
-      res.status(500).json({ message: "Failed to fetch admin stats" });
-    }
-  });
-
-  app.get("/api/admin/users", async (req, res) => {
-    try {
-      const users = await storage.getAllUsers();
-      res.json(users);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      res.status(500).json({ message: "Failed to fetch users" });
-    }
-  });
-
-  app.get("/api/admin/orders", async (req, res) => {
-    try {
-      const orders = await storage.getAllOrders();
-      orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      res.json(orders);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      res.status(500).json({ message: "Failed to fetch orders" });
-    }
-  });
-
-  app.patch("/api/admin/users/:userId/balance", async (req, res) => {
-    try {
-      const userId = parseInt(req.params.userId);
-      const { balance } = req.body;
-      
-      if (isNaN(userId) || typeof balance !== "string") {
-        return res.status(400).json({ message: "Invalid user ID or balance" });
-      }
-      
-      const updatedUser = await storage.updateUserBalance(userId, balance);
-      if (!updatedUser) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      res.json(updatedUser);
-    } catch (error) {
-      console.error("Error updating user balance:", error);
-      res.status(500).json({ message: "Failed to update user balance" });
-    }
   });
 
   // Get all services with current rates (simplified version)

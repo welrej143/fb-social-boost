@@ -20,8 +20,6 @@ export const services = pgTable("services", {
   serviceId: text("service_id").notNull().unique(),
   name: text("name").notNull(),
   rate: text("rate").notNull(),
-  minOrder: integer("min_order").notNull().default(1),
-  maxOrder: integer("max_order").notNull().default(10000),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
@@ -54,8 +52,6 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
   firstName: true,
   lastName: true,
-}).extend({
-  username: z.string().optional(),
 });
 
 export const loginSchema = createInsertSchema(users).pick({

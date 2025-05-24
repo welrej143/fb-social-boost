@@ -362,10 +362,6 @@ export class MemStorage implements IStorage {
   async getUserDeposits(userId: number): Promise<Deposit[]> {
     return Array.from(this.deposits.values()).filter(deposit => deposit.userId === userId);
   }
-
-  async getAllUsers(): Promise<User[]> {
-    return Array.from(this.users.values());
-  }
 }
 
 export const storage = new DatabaseStorage();

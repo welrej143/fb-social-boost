@@ -4,15 +4,6 @@ import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 
-// Catch any startup errors
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-});
-
 // Add CORS headers for production
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -29,16 +20,6 @@ app.use((req, res, next) => {
 // Parse JSON bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Health check route for Railway
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-// Basic root route that doesn't need database
-app.get('/', (req, res) => {
-  res.json({ message: 'Facebook Boost Pro API is running' });
-});
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -90,8 +71,10 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Use Railway's PORT environment variable or fallback to 5000
-  const port = parseInt(process.env.PORT || "5000");
+  // ALWAYS serve the app on port 5000
+  // this serves both the API and the client.
+  // It is the only port that is not firewalled.
+  const port = 5000;
   server.listen({
     port,
     host: "0.0.0.0",
