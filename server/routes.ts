@@ -510,6 +510,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin routes
+  app.get('/api/admin/stats', async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      const orders = await storage.getAllOrders();
+      
+      const totalUsers = users.length;
+      const totalOrders = orders.length;
+      const pendingOrders = orders.filter(order => order.status === 'Processing' || order.status === 'Pending').length;
+      
+      // Calculate total revenue from completed orders
+      const completedOrders = orders.filter(order => order.status === 'Completed' || order.status === 'completed');
+      const totalRevenue = completedOrders.reduce((sum, order) => sum + parseFloat(order.amount), 0).toFixed(2);
+      
+      res.json({
+        totalUsers,
+        totalOrders,
+        totalRevenue,
+        pendingOrders
+      });
+    } catch (error) {
+      console.error("Error fetching admin stats:", error);
+      res.status(500).json({ error: "Failed to fetch statistics" });
+    }
+  });
+
+  app.get('/api/admin/users', async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
+  app.get('/api/admin/orders', async (req, res) => {
+    try {
+      const orders = await storage.getAllOrders();
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      res.status(500).json({ error: "Failed to fetch orders" });
+    }
+  });
+
+  // Admin route to update user balance
+  app.patch('/api/admin/users/:userId/balance', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { balance } = req.body;
+      
+      if (!balance || isNaN(parseFloat(balance))) {
+        return res.status(400).json({ error: "Invalid balance amount" });
+      }
+      
+      const updatedUser = await storage.updateUserBalance(parseInt(userId), parseFloat(balance).toFixed(2));
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      res.json({ success: true, user: updatedUser });
+    } catch (error) {
+      console.error("Error updating user balance:", error);
+      res.status(500).json({ error: "Failed to update balance" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
