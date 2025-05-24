@@ -80,7 +80,7 @@ const SERVICE_BADGES = {
 export default function Home() {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [facebookLink, setFacebookLink] = useState("");
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(1000);
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
   const [showWallet, setShowWallet] = useState(false);
@@ -245,7 +245,7 @@ export default function Home() {
       return;
     }
 
-    const totalAmount = (parseFloat(selectedService.rate) * quantity).toFixed(2);
+    const totalAmount = (parseFloat(selectedService.rate) * quantity / 1000).toFixed(2);
 
     createOrderMutation.mutate({
       orderId: `ORDER_${Date.now()}`,
@@ -259,7 +259,7 @@ export default function Home() {
     });
   };
 
-  const totalPrice = selectedService ? (parseFloat(selectedService.rate) * quantity).toFixed(2) : "0.00";
+  const totalPrice = selectedService ? (parseFloat(selectedService.rate) * quantity / 1000).toFixed(2) : "0.00";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -524,7 +524,7 @@ export default function Home() {
                           <div className="space-y-2">
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-600">Quantity:</span>
-                              <span className="font-medium">{(quantity * 1000).toLocaleString()}</span>
+                              <span className="font-medium">{quantity.toLocaleString()}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-600">Rate per 1,000:</span>
