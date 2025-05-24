@@ -81,8 +81,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      // Create session
-      req.session.userId = user.id;
+      // Create session - convert string ID to number
+      req.session.userId = parseInt(user.id);
       req.session.userEmail = user.email;
 
       // Force session save
