@@ -205,7 +205,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/orders", isAuthenticated, async (req: any, res) => {
     try {
       console.log('Creating order with data:', req.body);
-      const userId = parseInt(req.session.userId);
+      console.log('Session data:', req.session);
+      console.log('Session userId:', req.session.userId);
+      console.log('Session userId type:', typeof req.session.userId);
+      
+      const userId = req.session.userId ? parseInt(req.session.userId.toString()) : null;
+      console.log('Converted userId:', userId);
+      
+      if (!userId) {
+        return res.status(401).json({ error: "User not authenticated or session invalid" });
+      }
       
       // Add userId to the order data
       const orderDataWithUser = {
