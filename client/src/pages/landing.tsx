@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, Users, TrendingUp, Shield } from "lucide-react";
+import { CheckCircle, Users, TrendingUp, Shield, Mail, Phone, MapPin } from "lucide-react";
 
 export default function Landing() {
   return (
