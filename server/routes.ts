@@ -201,12 +201,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create new order
+  // Process order: deduct wallet, submit to SMM API, then store in database
   app.post("/api/orders", async (req: any, res) => {
     try {
-      console.log('Creating order with data:', req.body);
+      console.log('Processing order with data:', req.body);
       
-      // Validate the order data directly (userId should be included from frontend)
+      // Validate the order data
       const orderData = insertOrderSchema.parse(req.body);
       
       // Validate Facebook URL
@@ -221,26 +221,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid service" });
       }
 
-      // Create order in our storage with pending payment status
-      const order = await storage.createOrder({
-        ...orderData,
-        status: "Pending Payment"
+      // Check user balance
+      const user = await storage.getUser(orderData.userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const userBalance = parseFloat(user.balance);
+      const orderAmount = parseFloat(orderData.amount);
+      
+      if (userBalance < orderAmount) {
+        return res.status(400).json({ error: "Insufficient wallet balance" });
+      }
+
+      // Submit order to SMM API first
+      console.log('Submitting to SMM API:', {
+        key: SMM_API_KEY,
+        action: 'add',
+        service: orderData.serviceId,
+        link: orderData.link,
+        quantity: orderData.quantity
       });
 
-      res.json({ 
-        success: true, 
-        order: {
-          id: order.orderId,
-          status: order.status,
-          service: order.serviceName,
-          quantity: order.quantity,
-          amount: order.amount
-        }
+      const smmResponse = await fetch(SMM_API_BASE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          key: SMM_API_KEY,
+          action: 'add',
+          service: orderData.serviceId,
+          link: orderData.link,
+          quantity: orderData.quantity
+        })
       });
+      
+      const smmResult = await smmResponse.json();
+      console.log('SMM API response:', smmResult);
+      
+      if (smmResult.order) {
+        // SMM API success - deduct from wallet and store order
+        const newBalance = (userBalance - orderAmount).toFixed(2);
+        await storage.updateUserBalance(orderData.userId, newBalance);
+        
+        // Store order in database with SMM order ID
+        const order = await storage.createOrder({
+          ...orderData,
+          status: "Processing",
+          smmOrderId: smmResult.order.toString()
+        });
+
+        res.json({ 
+          success: true, 
+          message: "Order submitted to SMM API successfully",
+          order: {
+            id: order.orderId,
+            status: order.status,
+            service: order.serviceName,
+            quantity: order.quantity,
+            amount: order.amount,
+            smmOrderId: smmResult.order
+          },
+          newBalance: newBalance
+        });
+      } else {
+        // SMM API error - don't charge or store anything
+        return res.status(400).json({ 
+          error: smmResult.error || "SMM API rejected the order" 
+        });
+      }
     } catch (error) {
-      console.error("Order creation error:", error);
+      console.error("Order processing error:", error);
       res.status(500).json({ 
-        error: error instanceof Error ? error.message : "Failed to create order" 
+        error: error instanceof Error ? error.message : "Failed to process order" 
       });
     }
   });

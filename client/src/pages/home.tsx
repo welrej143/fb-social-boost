@@ -129,12 +129,14 @@ export default function Home() {
     },
     onSuccess: (data) => {
       if (data.success) {
-        setCurrentOrderId(data.order.id);
-        setShowPayPal(true);
         toast({
-          title: "Order Created",
-          description: `Order ${data.order.id} created successfully. Please complete payment.`,
+          title: "Order Successful!",
+          description: `Order submitted to SMM API! New balance: $${data.newBalance}. SMM Order ID: ${data.order.smmOrderId}`,
         });
+        // Refresh user data and orders
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+        handleBackToServices();
       }
     },
     onError: (error: any) => {
@@ -560,24 +562,13 @@ export default function Home() {
                         </div>
 
                         {parseFloat(userBalance) >= parseFloat(totalPrice) ? (
-                          showPayPal && currentOrderId ? (
-                            <Button
-                              type="button"
-                              onClick={handleWalletPayment}
-                              className="w-full bg-green-600 hover:bg-green-700"
-                              disabled={walletPaymentMutation.isPending}
-                            >
-                              {walletPaymentMutation.isPending ? "Processing Payment..." : "Complete Payment with Wallet"}
-                            </Button>
-                          ) : (
                             <Button
                               type="submit"
-                              className="w-full bg-blue-600 hover:bg-blue-700"
+                              className="w-full bg-green-600 hover:bg-green-700"
                               disabled={createOrderMutation.isPending}
                             >
-                              {createOrderMutation.isPending ? "Creating Order..." : "Create Order"}
+                              {createOrderMutation.isPending ? "Processing Order..." : "Submit Order & Pay with Wallet"}
                             </Button>
-                          )
                         ) : (
                           <div className="text-center space-y-4">
                             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
