@@ -491,25 +491,19 @@ export default function Home() {
                               variant="outline"
                               size="icon"
                               onClick={() => handleQuantityChange(-1)}
+                              disabled={quantity <= 1000}
                             >
                               <Minus className="w-4 h-4" />
                             </Button>
-                            <Input
-                              id="quantity"
-                              type="number"
-                              min="1000"
-                              step="1000"
-                              value={quantity}
-                              onChange={(e) => setQuantity(Math.max(1000, parseInt(e.target.value) || 1000))}
-                              className="text-center font-semibold"
-                              placeholder="1000"
-                              required
-                            />
+                            <div className="flex-1 text-center font-semibold text-lg bg-gray-50 border rounded-md py-2">
+                              {quantity.toLocaleString()}
+                            </div>
                             <Button
                               type="button"
                               variant="outline"
                               size="icon"
                               onClick={() => handleQuantityChange(1)}
+                              disabled={quantity >= 50000}
                             >
                               <Plus className="w-4 h-4" />
                             </Button>
