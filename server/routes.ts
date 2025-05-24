@@ -234,14 +234,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Insufficient wallet balance" });
       }
 
-      // Submit order to SMM API first (multiply quantity by 1000 for API requirements)
-      const smmQuantity = orderData.quantity * 1000;
+      // Submit order to SMM API (quantity is already in correct format)
       console.log('Submitting to SMM API:', {
         key: SMM_API_KEY,
         action: 'add',
         service: orderData.serviceId,
         link: orderData.link,
-        quantity: smmQuantity
+        quantity: orderData.quantity
       });
 
       const smmResponse = await fetch(SMM_API_BASE, {
@@ -254,7 +253,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           action: 'add',
           service: orderData.serviceId,
           link: orderData.link,
-          quantity: smmQuantity
+          quantity: orderData.quantity
         })
       });
       

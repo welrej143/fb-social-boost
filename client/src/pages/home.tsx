@@ -218,12 +218,12 @@ export default function Home() {
     setShowPayPal(false);
     setSelectedService(null);
     setFacebookLink("");
-    setQuantity(1);
+    setQuantity(1000);
     setCurrentOrderId(null);
   };
 
   const handleQuantityChange = (delta: number) => {
-    setQuantity(Math.max(1, quantity + delta));
+    setQuantity(Math.max(1000, quantity + (delta * 1000)));
   };
 
   const isValidFacebookUrl = (url: string) => {
@@ -252,7 +252,7 @@ export default function Home() {
       serviceId: selectedService.serviceId,
       serviceName: selectedService.name,
       link: facebookLink,
-      quantity: quantity * 1000,
+      quantity: quantity,
       amount: totalAmount,
       status: "Pending Payment",
       userId: parseInt(user?.id || "0")
@@ -483,7 +483,7 @@ export default function Home() {
                         {/* Quantity Selection */}
                         <div>
                           <Label htmlFor="quantity">
-                            Quantity (in thousands) <span className="text-red-500">*</span>
+                            Quantity <span className="text-red-500">*</span>
                           </Label>
                           <div className="flex items-center space-x-4 mt-2">
                             <Button
@@ -497,10 +497,12 @@ export default function Home() {
                             <Input
                               id="quantity"
                               type="number"
-                              min="1"
+                              min="1000"
+                              step="1000"
                               value={quantity}
-                              onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                              onChange={(e) => setQuantity(Math.max(1000, parseInt(e.target.value) || 1000))}
                               className="text-center font-semibold"
+                              placeholder="1000"
                               required
                             />
                             <Button
