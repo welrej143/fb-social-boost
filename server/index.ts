@@ -21,6 +21,11 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Health check route for Railway
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -71,10 +76,8 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
+  // Use Railway's PORT environment variable or fallback to 5000
+  const port = parseInt(process.env.PORT || "5000");
   server.listen({
     port,
     host: "0.0.0.0",
