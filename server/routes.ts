@@ -140,6 +140,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all services with current rates
   app.get("/api/services", async (req, res) => {
     try {
+      console.log('Fetching services from SMM Valley API...');
+      console.log('API URL:', SMM_API_BASE);
+      console.log('API Key present:', !!SMM_API_KEY);
+      
       // Fetch fresh rates from SMM API
       const response = await fetch(SMM_API_BASE, {
         method: 'POST',
@@ -152,11 +156,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       });
 
+      console.log('SMM API response status:', response.status);
+
       if (!response.ok) {
-        throw new Error(`SMM API error: ${response.status}`);
+        const errorText = await response.text();
+        console.error('SMM API error response:', errorText);
+        throw new Error(`SMM API error: ${response.status} - ${errorText}`);
       }
 
       const smmServices = await response.json();
+      console.log('SMM API returned', Array.isArray(smmServices) ? smmServices.length : 'non-array', 'services');
+      console.log('First few services:', JSON.stringify(smmServices?.slice(0, 3), null, 2));
       const facebookServices = [];
 
       // Process each Facebook service
