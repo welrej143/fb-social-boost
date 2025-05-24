@@ -146,6 +146,49 @@ export default function Home() {
     },
   });
 
+  // Wallet payment mutation
+  const walletPaymentMutation = useMutation({
+    mutationFn: async (orderId: string) => {
+      const response = await fetch(`/api/orders/${orderId}/pay-wallet`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        toast({
+          title: "Payment Successful!",
+          description: `Order submitted to SMM API. New balance: $${data.newBalance}`,
+        });
+        // Refresh user data and orders
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+        handleBackToServices();
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Payment Failed",
+        description: error.message || "Failed to process wallet payment",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleWalletPayment = () => {
+    if (currentOrderId) {
+      walletPaymentMutation.mutate(currentOrderId);
+    }
+  };
+
   const handleServiceSelect = (service: Service) => {
     if (!isAuthenticated) {
       toast({
@@ -516,13 +559,24 @@ export default function Home() {
                         </div>
 
                         {parseFloat(userBalance) >= parseFloat(totalPrice) ? (
-                          <Button
-                            type="submit"
-                            className="w-full bg-blue-600 hover:bg-blue-700"
-                            disabled={createOrderMutation.isPending}
-                          >
-                            {createOrderMutation.isPending ? "Processing Order..." : "Pay with Wallet Balance"}
-                          </Button>
+                          showPayPal && currentOrderId ? (
+                            <Button
+                              type="button"
+                              onClick={handleWalletPayment}
+                              className="w-full bg-green-600 hover:bg-green-700"
+                              disabled={walletPaymentMutation.isPending}
+                            >
+                              {walletPaymentMutation.isPending ? "Processing Payment..." : "Complete Payment with Wallet"}
+                            </Button>
+                          ) : (
+                            <Button
+                              type="submit"
+                              className="w-full bg-blue-600 hover:bg-blue-700"
+                              disabled={createOrderMutation.isPending}
+                            >
+                              {createOrderMutation.isPending ? "Creating Order..." : "Create Order"}
+                            </Button>
+                          )
                         ) : (
                           <div className="text-center space-y-4">
                             <div className="bg-red-50 border border-red-200 rounded-lg p-4">

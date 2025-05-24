@@ -251,6 +251,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Process wallet payment and submit to SMM API
+  app.post("/api/orders/:orderId/pay-wallet", isAuthenticated, async (req: any, res) => {
+    try {
+      const { orderId } = req.params;
+      const userId = parseInt(req.session.userId);
+      
+      // Get the order
+      const order = await storage.getOrder(orderId);
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+      
+      if (order.userId !== userId) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+      
+      if (order.status !== "Pending Payment") {
+        return res.status(400).json({ error: "Order already processed" });
+      }
+      
+      // Get user and check balance
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const userBalance = parseFloat(user.balance);
+      const orderAmount = parseFloat(order.amount);
+      
+      if (userBalance < orderAmount) {
+        return res.status(400).json({ error: "Insufficient wallet balance" });
+      }
+      
+      // Submit order to SMM API
+      const smmResponse = await fetch(SMM_API_BASE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          key: SMM_API_KEY,
+          action: 'add',
+          service: order.serviceId,
+          link: order.link,
+          quantity: order.quantity
+        })
+      });
+      
+      const smmResult = await smmResponse.json();
+      
+      if (smmResult.order) {
+        // Order submitted successfully - deduct from wallet and update order
+        const newBalance = (userBalance - orderAmount).toFixed(2);
+        await storage.updateUserBalance(userId, newBalance);
+        await storage.updateOrderStatus(orderId, "Processing");
+        await storage.updateOrderSmmId(orderId, smmResult.order.toString());
+        
+        res.json({ 
+          success: true, 
+          message: "Payment processed and order submitted",
+          newBalance: newBalance,
+          smmOrderId: smmResult.order
+        });
+      } else {
+        // SMM API error
+        res.status(400).json({ 
+          error: smmResult.error || "Failed to submit order to SMM API" 
+        });
+      }
+      
+    } catch (error) {
+      console.error("Wallet payment error:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to process payment" 
+      });
+    }
+  });
+
   // Get order status
   app.get("/api/orders/:orderId", async (req, res) => {
     try {
