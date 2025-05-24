@@ -202,13 +202,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new order
-  app.post("/api/orders", isAuthenticated, async (req: any, res) => {
+  app.post("/api/orders", async (req: any, res) => {
     try {
       console.log('Creating order with data:', req.body);
       console.log('Session data:', req.session);
       console.log('Session userId:', req.session?.userId);
       
-      // Get userId from session (isAuthenticated middleware ensures it exists)
+      // Check if user is authenticated
+      if (!req.session?.userId) {
+        console.log('User not authenticated - no session userId');
+        return res.status(401).json({ error: "User not authenticated" });
+      }
+      
+      // Get userId from session
       const userId = parseInt(req.session.userId);
       
       // Add userId to the order data
