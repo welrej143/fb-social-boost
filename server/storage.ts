@@ -20,6 +20,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: { email: string; username: string; password: string; firstName?: string; lastName?: string }): Promise<User>;
   updateUserBalance(userId: number, newBalance: string): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>;
   
   getService(serviceId: string): Promise<Service | undefined>;
   getAllServices(): Promise<Service[]>;
