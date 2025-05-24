@@ -308,7 +308,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           smmOrderId: smmResult.order
         });
         
-        return res.json({ 
+        res.setHeader('Content-Type', 'application/json');
+        return res.status(200).json({ 
           success: true, 
           message: "Payment processed and order submitted",
           newBalance: newBalance,
