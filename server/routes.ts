@@ -437,11 +437,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all orders
+  // Get all orders with live status from SMM Valley API
   app.get("/api/orders", async (req, res) => {
     try {
       const orders = await storage.getAllOrders();
-      res.json(orders);
+      
+      // Update status from SMM Valley API for orders with SMM Order IDs
+      const updatedOrders = await Promise.all(orders.map(async (order) => {
+        if (order.smmOrderId) {
+          try {
+            const response = await fetch(SMM_API_BASE, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({
+                key: SMM_API_KEY,
+                action: 'status',
+                order: order.smmOrderId
+              })
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              
+              if (result && result.status) {
+                // Update status in database if it changed
+                if (result.status !== order.status) {
+                  await storage.updateOrderStatus(order.orderId, result.status);
+                  return { ...order, status: result.status };
+                }
+              }
+            }
+          } catch (error) {
+            console.error(`Error fetching status for order ${order.smmOrderId}:`, error);
+          }
+        }
+        return order;
+      }));
+
+      res.json(updatedOrders);
     } catch (error) {
       console.error("Error fetching orders:", error);
       res.status(500).json({ error: "Failed to fetch orders" });
