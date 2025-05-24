@@ -192,15 +192,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             minOrder: smmService.min || 100,
             maxOrder: smmService.max || 100000
           });
-
-          // Try to store/update in our storage (non-blocking, fire-and-forget)
-          storage.createOrUpdateService({
-            serviceId,
-            name: serviceName,
-            rate: ourRate
-          }).catch(dbError => {
-            console.warn(`Failed to save service ${serviceId} to database:`, dbError);
-          });
         } else {
           facebookServices.push({
             serviceId,
