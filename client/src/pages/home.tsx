@@ -650,11 +650,11 @@ export default function Home() {
           </section>
 
           {/* Customer Reviews Section */}
-          <section className="bg-gray-900 py-16">
+          <section className="bg-gray-50 py-16">
             <div className="max-w-6xl mx-auto px-4">
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-white mb-4">What Our Customers Say</h2>
-                <p className="text-gray-300">Real results from real customers</p>
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">What Our Customers Say</h2>
+                <p className="text-gray-600">Real results from real customers</p>
               </div>
             
               <div className="overflow-x-auto scrollbar-hide">
@@ -703,21 +703,21 @@ export default function Home() {
                     verified: true
                   }
                 ].map((review, index) => (
-                  <Card key={index} className="flex-shrink-0 w-80 bg-gray-800 border-gray-700">
+                  <Card key={index} className="flex-shrink-0 w-80 bg-white border-gray-200 shadow-lg">
                     <CardContent className="p-6">
                       <div className="flex items-center mb-4">
-                        <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-3">
-                          <span className="text-white font-semibold text-lg">
+                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                          <span className="text-blue-600 font-semibold text-lg">
                             {review.name.split(' ').map(n => n[0]).join('')}
                           </span>
                         </div>
                         <div>
-                          <h4 className="font-semibold text-white">{review.name}</h4>
-                          <p className="text-sm text-gray-400">{review.service}</p>
+                          <h4 className="font-semibold text-gray-900">{review.name}</h4>
+                          <p className="text-sm text-gray-500">{review.service}</p>
                         </div>
                         {review.verified && (
                           <div className="ml-auto">
-                            <span className="bg-green-600 text-white text-xs px-2 py-1 rounded-full">
+                            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
                               Verified
                             </span>
                           </div>
@@ -728,7 +728,7 @@ export default function Home() {
                         {[...Array(5)].map((_, i) => (
                           <svg
                             key={i}
-                            className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400' : 'text-gray-600'}`}
+                            className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -737,7 +737,7 @@ export default function Home() {
                         ))}
                       </div>
                       
-                      <p className="text-gray-300 text-sm leading-relaxed">{review.review}</p>
+                      <p className="text-gray-700 text-sm leading-relaxed">{review.review}</p>
                     </CardContent>
                   </Card>
                 ))}
