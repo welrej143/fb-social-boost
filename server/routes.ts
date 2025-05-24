@@ -31,6 +31,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertUserSchema.parse(req.body);
       
+      // Validate required fields
+      if (!validatedData.email || !validatedData.password) {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(validatedData.email);
       if (existingUser) {
@@ -43,13 +48,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email: validatedData.email,
         username: validatedData.email, // Use email as username
         password: hashedPassword,
-        firstName: validatedData.firstName,
-        lastName: validatedData.lastName,
+        firstName: validatedData.firstName ?? undefined,
+        lastName: validatedData.lastName ?? undefined,
       });
 
       // Create session
       req.session.userId = user.id;
-      req.session.userEmail = user.email;
+      req.session.userEmail = user.email ?? undefined;
 
       // Force session save
       req.session.save((err) => {
@@ -69,6 +74,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = loginSchema.parse(req.body);
       
+      // Validate required fields
+      if (!validatedData.email || !validatedData.password) {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+      
       // Find user by email
       const user = await storage.getUserByEmail(validatedData.email);
       if (!user) {
@@ -81,9 +91,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      // Create session - convert string ID to number
-      req.session.userId = parseInt(user.id);
-      req.session.userEmail = user.email;
+      // Create session
+      req.session.userId = user.id;
+      req.session.userEmail = user.email ?? undefined;
 
       // Force session save
       req.session.save((err) => {
