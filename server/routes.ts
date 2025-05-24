@@ -246,10 +246,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Process wallet payment and submit to SMM API
-  app.post("/api/orders/:orderId/pay-wallet", isAuthenticated, async (req: any, res) => {
+  app.post("/api/orders/:orderId/pay-wallet", async (req: any, res) => {
     try {
       const { orderId } = req.params;
-      const userId = parseInt(req.session.userId);
+      console.log('Processing wallet payment for order:', orderId);
       
       // Get the order
       const order = await storage.getOrder(orderId);
@@ -257,9 +257,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Order not found" });
       }
       
-      if (order.userId !== userId) {
-        return res.status(403).json({ error: "Unauthorized" });
-      }
+      const userId = order.userId;
+      console.log('Order belongs to user:', userId);
       
       if (order.status !== "Pending Payment") {
         return res.status(400).json({ error: "Order already processed" });
@@ -302,7 +301,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateOrderStatus(orderId, "Processing");
         await storage.updateOrderSmmId(orderId, smmResult.order.toString());
         
-        res.json({ 
+        console.log('Sending successful payment response:', {
+          success: true, 
+          message: "Payment processed and order submitted",
+          newBalance: newBalance,
+          smmOrderId: smmResult.order
+        });
+        
+        return res.json({ 
           success: true, 
           message: "Payment processed and order submitted",
           newBalance: newBalance,
@@ -310,14 +316,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       } else {
         // SMM API error
-        res.status(400).json({ 
+        console.log('SMM API error response:', smmResult);
+        return res.status(400).json({ 
           error: smmResult.error || "Failed to submit order to SMM API" 
         });
       }
       
     } catch (error) {
       console.error("Wallet payment error:", error);
-      res.status(500).json({ 
+      return res.status(500).json({ 
         error: error instanceof Error ? error.message : "Failed to process payment" 
       });
     }
