@@ -245,7 +245,9 @@ export default function Home() {
       return;
     }
 
-    const totalAmount = (parseFloat(selectedService.rate) * quantity / 1000).toFixed(2);
+    const basePrice = parseFloat(selectedService.rate) * quantity / 1000;
+    const discount = getDiscount(quantity);
+    const totalAmount = (basePrice - (basePrice * discount)).toFixed(2);
 
     createOrderMutation.mutate({
       orderId: `ORDER_${Date.now()}`,
@@ -259,7 +261,18 @@ export default function Home() {
     });
   };
 
-  const totalPrice = selectedService ? (parseFloat(selectedService.rate) * quantity / 1000).toFixed(2) : "0.00";
+  // Calculate discount based on quantity
+  const getDiscount = (qty: number) => {
+    if (qty >= 20000) return 0.15; // 15% discount
+    if (qty >= 10000) return 0.10; // 10% discount
+    if (qty >= 5000) return 0.05;  // 5% discount
+    return 0; // No discount
+  };
+
+  const basePrice = selectedService ? parseFloat(selectedService.rate) * quantity / 1000 : 0;
+  const discount = getDiscount(quantity);
+  const discountAmount = basePrice * discount;
+  const totalPrice = (basePrice - discountAmount).toFixed(2);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -524,11 +537,33 @@ export default function Home() {
                               <span className="text-gray-600">Rate per 1,000:</span>
                               <span className="font-medium">${selectedService?.rate}</span>
                             </div>
+                            {discount > 0 && (
+                              <>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-gray-600">Subtotal:</span>
+                                  <span className="font-medium">${basePrice.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                  <span className="text-green-600">Discount ({(discount * 100)}%):</span>
+                                  <span className="text-green-600">-${discountAmount.toFixed(2)}</span>
+                                </div>
+                              </>
+                            )}
                             <Separator />
                             <div className="flex justify-between text-lg font-bold">
                               <span className="text-gray-900">Total Price:</span>
                               <span className="text-blue-600">${totalPrice}</span>
                             </div>
+                            {quantity >= 5000 && (
+                              <div className="text-xs text-green-600 font-medium text-center">
+                                🎉 Volume discount applied!
+                              </div>
+                            )}
+                            {quantity < 5000 && quantity >= 1000 && (
+                              <div className="text-xs text-gray-500 text-center">
+                                💡 Order 5,000+ for 5% discount!
+                              </div>
+                            )}
                           </div>
                         </div>
 
