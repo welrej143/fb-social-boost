@@ -70,12 +70,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUserBalance(userId: number, newBalance: string): Promise<User | undefined> {
-    const [user] = await db
-      .update(users)
-      .set({ balance: newBalance, updatedAt: new Date() })
-      .where(eq(users.id, userId))
-      .returning();
-    return user;
+    try {
+      const [user] = await db
+        .update(users)
+        .set({ balance: newBalance, updatedAt: new Date() })
+        .where(eq(users.id, userId))
+        .returning();
+      return user;
+    } catch (error) {
+      console.error("Error updating user balance:", error);
+      return undefined;
+    }
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    try {
+      return await db.select().from(users);
+    } catch (error) {
+      console.error("Error fetching all users:", error);
+      return [];
+    }
   }
 
   async getService(serviceId: string): Promise<Service | undefined> {
