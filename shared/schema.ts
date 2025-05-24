@@ -52,6 +52,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
   firstName: true,
   lastName: true,
+}).extend({
+  username: z.string().optional(),
 });
 
 export const loginSchema = createInsertSchema(users).pick({

@@ -29,27 +29,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.post('/api/register', async (req, res) => {
     try {
-      const validatedData = insertUserSchema.parse(req.body);
+      console.log('Registration request body:', req.body);
       
-      // Validate required fields
-      if (!validatedData.email || !validatedData.password) {
+      // Validate required fields first
+      if (!req.body.email || !req.body.password) {
         return res.status(400).json({ message: "Email and password are required" });
       }
 
       // Check if user already exists
-      const existingUser = await storage.getUserByEmail(validatedData.email);
+      const existingUser = await storage.getUserByEmail(req.body.email);
       if (existingUser) {
         return res.status(400).json({ message: "User already exists" });
       }
 
       // Hash password and create user
-      const hashedPassword = await hashPassword(validatedData.password);
+      const hashedPassword = await hashPassword(req.body.password);
       const user = await storage.createUser({
-        email: validatedData.email,
-        username: validatedData.email, // Use email as username
+        email: req.body.email,
+        username: req.body.email, // Use email as username
         password: hashedPassword,
-        firstName: validatedData.firstName ?? undefined,
-        lastName: validatedData.lastName ?? undefined,
+        firstName: req.body.firstName || undefined,
+        lastName: req.body.lastName || undefined,
       });
 
       // Create session
