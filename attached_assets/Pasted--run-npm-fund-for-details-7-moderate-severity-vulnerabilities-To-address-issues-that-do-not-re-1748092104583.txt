@@ -1,0 +1,118 @@
+  run `npm fund` for details
+
+
+7 moderate severity vulnerabilities
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+[stage-0 11/15] RUN --mount=type=cache,id=s/b783be9e-9259-4616-bb2e-35f83da3662d-/root/npm,target=/root/.npm npm ci  ✔ 7s
+
+[stage-0 12/15] COPY . /app/.
+
+[stage-0 12/15] COPY . /app/.  ✔ 167ms
+
+[stage-0 13/15] RUN --mount=type=cache,id=s/b783be9e-9259-4616-bb2e-35f83da3662d-node_modules/cache,target=/app/node_modules/.cache npm run build
+
+npm warn config production Use `--omit=dev` instead.
+
+
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+
+vite v5.4.14 building for production...
+
+transforming...
+
+Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+
+✓ 1673 modules transformed.
+
+rendering chunks...
+
+computing gzip size...
+
+../dist/public/index.html                   0.63 kB │ gzip:  0.38 kB
+
+../dist/public/assets/index-Dxp9CyHB.css   68.48 kB │ gzip: 11.99 kB
+../dist/public/assets/index-DLHhKOj_.js   320.59 kB │ gzip: 99.64 kB
+
+✓ built in 3.60s
+
+
+  dist/index.js  31.2kb
+
+⚡ Done in 7ms
+
+[stage-0 13/15] RUN --mount=type=cache,id=s/b783be9e-9259-4616-bb2e-35f83da3662d-node_modules/cache,target=/app/node_modules/.cache npm run build  ✔ 4s
+
+[stage-0 14/15] RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile
+
+[stage-0 14/15] RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile  ✔ 106ms
+
+[stage-0 15/15] COPY . /app
+
+[stage-0 15/15] COPY . /app  ✔ 45ms
+
+exporting to docker image format
+
+exporting to image
+
+[auth] sharing credentials for production-asia-southeast1-eqsg3a.railway-registry.com
+
+[auth] sharing credentials for production-asia-southeast1-eqsg3a.railway-registry.com  ✔ 0ms
+
+importing to docker
+
+importing to docker  ✔ 11s
+
+=== Successfully Built! ===
+
+Run:
+
+docker run -it production-asia-southeast1-eqsg3a.railway-registry.com/b783be9e-9259-4616-bb2e-35f83da3662d:ebd34bce-e652-49b1-ae2c-3d35db93100f
+
+Build time: 37.39 seconds
+
+ 
+
+====================
+
+Starting Healthcheck
+
+====================
+
+
+Path: /health
+
+Retry window: 5m0s
+
+ 
+
+Attempt #1 failed with service unavailable. Continuing to retry for 4m49s
+
+Attempt #2 failed with service unavailable. Continuing to retry for 4m37s
+
+Attempt #3 failed with service unavailable. Continuing to retry for 4m35s
+
+Attempt #4 failed with service unavailable. Continuing to retry for 4m30s
+
+Attempt #5 failed with service unavailable. Continuing to retry for 4m22s
+
+Attempt #6 failed with service unavailable. Continuing to retry for 4m5s
+
+Attempt #7 failed with service unavailable. Continuing to retry for 3m35s
+
+Attempt #8 failed with service unavailable. Continuing to retry for 3m4s
+
+Attempt #9 failed with service unavailable. Continuing to retry for 2m34s
+
+Attempt #10 failed with service unavailable. Continuing to retry for 2m3s

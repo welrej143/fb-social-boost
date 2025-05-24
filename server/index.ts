@@ -4,6 +4,15 @@ import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 
+// Catch any startup errors
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 // Add CORS headers for production
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -24,6 +33,11 @@ app.use(express.urlencoded({ extended: true }));
 // Health check route for Railway
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Basic root route that doesn't need database
+app.get('/', (req, res) => {
+  res.json({ message: 'Facebook Boost Pro API is running' });
 });
 
 app.use((req, res, next) => {
