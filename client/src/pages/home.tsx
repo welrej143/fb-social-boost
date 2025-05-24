@@ -265,8 +265,8 @@ export default function Home() {
   const getDiscount = (qty: number) => {
     if (qty >= 20000) return 0.20; // 20% discount
     if (qty >= 10000) return 0.15; // 15% discount
-    if (qty >= 5000) return 0.12;  // 12% discount
-    return 0.10; // 10% discount for all orders
+    if (qty >= 5000) return 0.10;  // 10% discount
+    return 0; // No discount for 1,000-4,000
   };
 
   const basePrice = selectedService ? parseFloat(selectedService.rate) * quantity / 1000 : 0;
@@ -554,18 +554,20 @@ export default function Home() {
                               <span className="text-gray-900">Total Price:</span>
                               <span className="text-blue-600">${totalPrice}</span>
                             </div>
-                            <div className="text-xs text-green-600 font-medium text-center">
-                              🎉 {(discount * 100)}% discount applied!
-                            </div>
+                            {discount > 0 && (
+                              <div className="text-xs text-green-600 font-medium text-center">
+                                🎉 {(discount * 100)}% discount applied!
+                              </div>
+                            )}
                             {/* Show discount tiers */}
                             <div className="mt-2 p-2 bg-blue-50 rounded text-xs">
                               <div className="font-medium text-blue-800 mb-1">💰 Volume Discounts:</div>
                               <div className="space-y-1 text-blue-700">
                                 <div className={quantity >= 1000 && quantity < 5000 ? "font-bold" : ""}>
-                                  All orders: 10% off
+                                  1,000-4,999: Regular price
                                 </div>
                                 <div className={quantity >= 5000 && quantity < 10000 ? "font-bold" : ""}>
-                                  5,000-9,999: 12% off
+                                  5,000-9,999: 10% off
                                 </div>
                                 <div className={quantity >= 10000 && quantity < 20000 ? "font-bold" : ""}>
                                   10,000-19,999: 15% off
