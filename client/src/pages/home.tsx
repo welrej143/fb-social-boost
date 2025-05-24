@@ -480,60 +480,38 @@ export default function Home() {
                           </p>
                         </div>
 
-                        {/* Quantity Selection */}
-                        <div>
-                          <Label htmlFor="quantity">
-                            Quantity <span className="text-red-500">*</span>
-                          </Label>
-                          <div className="flex items-center space-x-4 mt-2">
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon"
-                              onClick={() => handleQuantityChange(-1)}
-                            >
-                              <Minus className="w-4 h-4" />
-                            </Button>
-                            <Input
-                              id="quantity"
-                              type="number"
-                              min="1000"
-                              step="1000"
-                              value={quantity}
-                              onChange={(e) => setQuantity(Math.max(1000, parseInt(e.target.value) || 1000))}
-                              className="text-center font-semibold"
-                              placeholder="1000"
-                              required
-                            />
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon"
-                              onClick={() => handleQuantityChange(1)}
-                            >
-                              <Plus className="w-4 h-4" />
-                            </Button>
+                        {/* Fixed Package Info */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                              <span className="text-white font-bold">1K</span>
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-semibold text-gray-900">Standard Package</p>
+                              <p className="text-sm text-gray-600">1,000 {selectedService?.name.toLowerCase()} delivered instantly</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-lg font-bold text-blue-600">${selectedService?.rate}</p>
+                            </div>
                           </div>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Each unit represents 1,000 likes/followers/views/reactions
-                          </p>
                         </div>
 
-                        {/* Price Calculation */}
+                        {/* Order Summary */}
                         <div className="bg-gray-50 rounded-lg p-4">
+                          <h4 className="font-semibold text-gray-900 mb-3">Order Summary</h4>
                           <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                              <span className="text-gray-600">Quantity:</span>
-                              <span className="font-medium">{quantity.toLocaleString()}</span>
+                              <span className="text-gray-600">Service:</span>
+                              <span className="font-medium">{selectedService?.name}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                              <span className="text-gray-600">Rate per 1,000:</span>
-                              <span className="font-medium">${selectedService?.rate}</span>
+                              <span className="text-gray-600">Package:</span>
+                              <span className="font-medium">1,000 units</span>
                             </div>
                             <Separator />
                             <div className="flex justify-between text-lg font-bold">
                               <span className="text-gray-900">Total Price:</span>
-                              <span className="text-blue-600">${totalPrice}</span>
+                              <span className="text-blue-600">${selectedService?.rate}</span>
                             </div>
                           </div>
                         </div>
