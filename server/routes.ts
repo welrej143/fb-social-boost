@@ -167,6 +167,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const smmServices = await response.json();
       console.log('SMM API returned', Array.isArray(smmServices) ? smmServices.length : 'non-array', 'services');
       console.log('First few services:', JSON.stringify(smmServices?.slice(0, 3), null, 2));
+      
+      // Check if our Facebook service IDs exist
+      const facebookServiceIds = Object.keys(FACEBOOK_SERVICES);
+      console.log('Looking for Facebook service IDs:', facebookServiceIds);
+      const foundServices = smmServices.filter((s: any) => facebookServiceIds.includes(s.service));
+      console.log('Found Facebook services:', foundServices.length);
+      foundServices.forEach((s: any) => console.log(`- Service ${s.service}: ${s.name}`));
       const facebookServices = [];
 
       // Process each Facebook service
