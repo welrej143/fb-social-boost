@@ -1,0 +1,97 @@
+Fetching services from SMM Valley API...
+API URL: https://smmvaly.com/api/v2
+API Key present: true
+Session check: undefined
+7:43:05 AM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}
+SMM API response status: 200
+SMM API returned 961 services
+First few services: [
+  {
+    "service": "2062",
+    "name": "Instagram Followers | Max 10M | 𝗔𝗟𝗟 𝗧𝘆𝗽𝗲𝘀 𝗙𝗹𝗮𝗴 𝗪𝗼𝗿𝗸𝗶𝗻𝗴 | 𝐑𝐞𝐚𝐥 𝐏𝐞𝐨𝐩𝐥𝐞 𝐖𝐢𝐭𝐡 𝐏𝐨𝐬𝐭𝐬 | 100k/days ~ 𝐍𝐎 𝗥𝗘𝗙𝗜𝗟𝗟",
+    "type": "Default",
+    "rate": "1.56",
+    "min": "50",
+    "max": "100000",
+    "dripfeed": false,
+    "refill": false,
+    "cancel": false,
+    "category": "𝐈𝐧𝐬𝐭𝐚𝐠𝐫𝐚𝐦 𝐅𝐨𝐥𝐥𝐨𝐰𝐞𝐫𝐬 ᵁᴾᴰᴬᵀᴱᴰ"
+  },
+  {
+    "service": "1996",
+    "name": "Instagram Followers | REAL |  High Quality | 30 Days Auto refill | 10k-20k/Day | NON DROP | Flag on/OF ⭐🔥",
+    "type": "Default",
+    "rate": "3.90",
+    "min": "100",
+    "max": "1000000",
+    "dripfeed": false,
+    "refill": true,
+    "cancel": true,
+    "category": "𝐈𝐧𝐬𝐭𝐚𝐠𝐫𝐚𝐦 𝐅𝐨𝐥𝐥𝐨𝐰𝐞𝐫𝐬 ᵁᴾᴰᴬᵀᴱᴰ"
+  },
+  {
+    "service": "2022",
+    "name": "Instagram Followers | 𝐑𝐞𝐚𝐥 | Non Drop | Refill 30 Days ♻️ | Speed Day 50K ⚡️",
+    "type": "Default",
+    "rate": "2.25",
+    "min": "10",
+    "max": "1000000",
+    "dripfeed": false,
+    "refill": false,
+    "cancel": false,
+    "category": "𝐈𝐧𝐬𝐭𝐚𝐠𝐫𝐚𝐦 𝐅𝐨𝐥𝐥𝐨𝐰𝐞𝐫𝐬 ᵁᴾᴰᴬᵀᴱᴰ"
+  }
+]
+Looking for Facebook service IDs: [ '55', '221', '254', '1775', '1779', '1977' ]
+Found Facebook services: 6
+- Service 1977: Facebook Page Likes [ refill 30 days ] [ Cheap ]
+- Service 1775: Facebook Page followers [Speed: 500-1k/D~ Refill: 30 days ]
+- Service 55: Facebook Profile Followers [ Speed: 500-1k/Day ] Refill 30 days
+- Service 221: Facebook Post Likes | INSTANT | 50K/Day | Real Accounts | 30 Days Refill
+- Service 1779: Facebook Post Likes | Hearts/Love ❤️ | 𝐒𝐔𝐏𝐄𝐑 𝐇𝐈𝐆𝐇 𝐐𝐔𝐋𝐀𝐈𝐓𝐘 | S.INSTANT
+- Service 254: Facebook Video Views | MONETIZED | 15 Seconds | Speed: 10K-100k/Day | INSTANT
+Error fetching services: ErrorEvent {
+  [Symbol(kTarget)]: WebSocket {
+    _events: [Object: null prototype] {
+      error: [Function],
+      message: [Function],
+      close: [Function],
+      open: [Function]
+    },
+    _eventsCount: 4,
+    _maxListeners: undefined,
+    _binaryType: 'arraybuffer',
+    _closeCode: 1006,
+    _closeFrameReceived: false,
+    _closeFrameSent: false,
+    _closeMessage: <Buffer >,
+    _closeTimer: null,
+    _errorEmitted: true,
+    _extensions: {},
+    _paused: false,
+    _protocol: '',
+    _readyState: 3,
+    _receiver: null,
+    _sender: null,
+    _socket: null,
+    _bufferedAmount: 0,
+    _isServer: false,
+    _redirects: 0,
+    _autoPong: true,
+    _url: 'wss://dpg-d0oml2je5dus73d14l50-a.oregon-postgres.render.com/v2',
+    _req: null,
+    [Symbol(shapeMode)]: false,
+    [Symbol(kCapture)]: false
+  },
+  [Symbol(kType)]: 'error',
+  [Symbol(kError)]: Error: connect ETIMEDOUT 35.227.164.209:443
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16) {
+    errno: -110,
+    code: 'ETIMEDOUT',
+    syscall: 'connect',
+    address: '35.227.164.209',
+    port: 443
+  },
+  [Symbol(kMessage)]: 'connect ETIMEDOUT 35.227.164.209:443'
+}
