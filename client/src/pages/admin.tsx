@@ -6,9 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Users, DollarSign, ShoppingCart, TrendingUp, Edit2, Save, X } from "lucide-react";
+import { Users, DollarSign, ShoppingCart, TrendingUp, Edit2, Save, X, Ticket, MessageSquare, Calendar } from "lucide-react";
 import type { User, Order } from "@shared/schema";
 
 interface AdminStats {
@@ -24,6 +27,9 @@ export default function Admin() {
   const { toast } = useToast();
   const [editingUser, setEditingUser] = useState<number | null>(null);
   const [newBalance, setNewBalance] = useState("");
+  const [replyingTicket, setReplyingTicket] = useState<string | null>(null);
+  const [ticketReply, setTicketReply] = useState("");
+  const [ticketStatus, setTicketStatus] = useState("");
 
   // Fetch admin stats
   const { data: stats, isLoading: statsLoading } = useQuery<AdminStats>({
@@ -38,6 +44,11 @@ export default function Admin() {
   // Fetch all orders
   const { data: orders, isLoading: ordersLoading } = useQuery<Order[]>({
     queryKey: ["/api/admin/orders"],
+  });
+
+  // Fetch all tickets
+  const { data: tickets, isLoading: ticketsLoading } = useQuery({
+    queryKey: ["/api/admin/tickets"],
   });
 
   // Update user balance mutation
@@ -84,6 +95,87 @@ export default function Admin() {
   const handleCancelEdit = () => {
     setEditingUser(null);
     setNewBalance("");
+  };
+
+  // Update ticket status mutation
+  const updateTicketStatusMutation = useMutation({
+    mutationFn: async ({ ticketId, status }: { ticketId: string; status: string }) => {
+      const response = await fetch(`/api/admin/tickets/${ticketId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) throw new Error("Failed to update ticket status");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/tickets"] });
+      toast({ title: "Success", description: "Ticket status updated successfully" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to update ticket status", variant: "destructive" });
+    },
+  });
+
+  // Reply to ticket mutation
+  const replyToTicketMutation = useMutation({
+    mutationFn: async ({ ticketId, adminReply, status }: { ticketId: string; adminReply: string; status?: string }) => {
+      const response = await fetch(`/api/admin/tickets/${ticketId}/reply`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminReply, status }),
+      });
+      if (!response.ok) throw new Error("Failed to reply to ticket");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/tickets"] });
+      setReplyingTicket(null);
+      setTicketReply("");
+      setTicketStatus("");
+      toast({ title: "Success", description: "Reply sent successfully" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to send reply", variant: "destructive" });
+    },
+  });
+
+  const handleReplyToTicket = (ticketId: string, currentStatus: string) => {
+    setReplyingTicket(ticketId);
+    setTicketStatus(currentStatus);
+  };
+
+  const handleSendReply = (ticketId: string) => {
+    if (!ticketReply.trim()) {
+      toast({ title: "Error", description: "Please enter a reply message", variant: "destructive" });
+      return;
+    }
+    replyToTicketMutation.mutate({ ticketId, adminReply: ticketReply, status: ticketStatus });
+  };
+
+  const handleCancelReply = () => {
+    setReplyingTicket(null);
+    setTicketReply("");
+    setTicketStatus("");
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Open': return 'bg-blue-100 text-blue-800';
+      case 'In Progress': return 'bg-yellow-100 text-yellow-800';
+      case 'Resolved': return 'bg-green-100 text-green-800';
+      case 'Closed': return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'High': return 'bg-red-100 text-red-800';
+      case 'Medium': return 'bg-orange-100 text-orange-800';
+      case 'Low': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
   if (statsLoading || usersLoading || ordersLoading) {
@@ -177,16 +269,22 @@ export default function Admin() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Users Management */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Users Management</CardTitle>
-            <CardDescription>
-              View and manage user accounts and balances
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+      <Tabs defaultValue="users" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="users">Users</TabsTrigger>
+          <TabsTrigger value="orders">Orders</TabsTrigger>
+          <TabsTrigger value="tickets">Support Tickets</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="users">
+          <Card>
+            <CardHeader>
+              <CardTitle>Users Management</CardTitle>
+              <CardDescription>
+                View and manage user accounts and balances
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
             <div className="space-y-4">
               {users?.map((user) => (
                 <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
