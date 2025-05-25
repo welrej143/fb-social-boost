@@ -88,7 +88,7 @@ export default function Support() {
         priority: 'Medium'
       });
       setShowForm(false);
-      queryClient.invalidateQueries({ queryKey: ['/api/tickets/user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/tickets/user', user?.id] });
     },
     onError: (error: any) => {
       toast({
