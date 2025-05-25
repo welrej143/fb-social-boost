@@ -557,16 +557,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const totalUsers = users.length;
       const totalOrders = orders.length;
-      const pendingOrders = orders.filter(order => order.status === 'Processing' || order.status === 'Pending').length;
+      const pendingOrders = orders.filter(order => 
+        order.status === 'Processing' || 
+        order.status === 'Pending' || 
+        order.status === 'Pending Payment'
+      ).length;
       
-      // Calculate total revenue from completed orders
-      const completedOrders = orders.filter(order => order.status === 'Completed' || order.status === 'completed');
-      const totalRevenue = completedOrders.reduce((sum, order) => sum + parseFloat(order.amount), 0).toFixed(2);
+      // Calculate total revenue from all paid orders (not just completed)
+      const paidOrders = orders.filter(order => 
+        order.status !== 'Pending Payment' && 
+        order.status !== 'Cancelled' && 
+        order.status !== 'Failed'
+      );
+      
+      const totalRevenue = paidOrders.reduce((sum, order) => sum + parseFloat(order.amount), 0);
+      
+      // Calculate profit (customer pays 5x what we pay SMM Valley)
+      const totalCost = paidOrders.reduce((sum, order) => sum + (parseFloat(order.amount) / 5), 0);
+      const totalProfit = totalRevenue - totalCost;
       
       res.json({
         totalUsers,
         totalOrders,
-        totalRevenue,
+        totalRevenue: totalRevenue.toFixed(2),
+        totalProfit: totalProfit.toFixed(2),
+        totalCost: totalCost.toFixed(2),
         pendingOrders
       });
     } catch (error) {
