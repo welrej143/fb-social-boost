@@ -45,7 +45,7 @@ export default function Login() {
     onSuccess: () => {
       toast({
         title: "Account Created!",
-        description: "Welcome to Facebook Boost Pro",
+        description: "Welcome to FB Social Boost",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       // Small delay to ensure session is set
@@ -90,7 +90,7 @@ export default function Login() {
             <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
               <Facebook className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-gray-900">Facebook Boost Pro</span>
+            <span className="text-2xl font-bold text-gray-900">FB Social Boost</span>
           </div>
           <p className="text-gray-600">
             {isRegistering ? "Create your account" : "Sign in to your account"}
@@ -115,7 +115,7 @@ export default function Login() {
             <CardDescription>
               {isRegistering 
                 ? "Join thousands of users boosting their Facebook presence" 
-                : "Welcome back to Facebook Boost Pro"
+                : "Welcome back to FB Social Boost"
               }
             </CardDescription>
           </CardHeader>
