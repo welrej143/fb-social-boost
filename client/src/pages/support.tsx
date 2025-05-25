@@ -118,7 +118,19 @@ export default function Support() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {!showForm ? (
+              {!user ? (
+                <div className="text-center py-6">
+                  <p className="text-gray-600 mb-4">
+                    Please log in to create a support ticket
+                  </p>
+                  <Button 
+                    onClick={() => window.location.href = '/login'} 
+                    className="w-full"
+                  >
+                    Log In to Create Ticket
+                  </Button>
+                </div>
+              ) : !showForm ? (
                 <Button onClick={() => setShowForm(true)} className="w-full">
                   Create New Ticket
                 </Button>
