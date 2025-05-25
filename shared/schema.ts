@@ -91,6 +91,7 @@ export const insertDepositSchema = createInsertSchema(deposits).omit({
 
 export const insertTicketSchema = createInsertSchema(tickets).omit({
   id: true,
+  ticketId: true,
   createdAt: true,
   updatedAt: true,
 });
