@@ -989,7 +989,6 @@ export default function Home() {
               <ul className="space-y-2 text-sm text-gray-400">
                 <li><a href="/help" className="hover:text-white transition-colors">Help Center</a></li>
                 <li><a href="/support" className="hover:text-white transition-colors">Create a Ticket</a></li>
-                <li><button onClick={() => handleOrderStatus()} className="hover:text-white transition-colors">Order Status</button></li>
               </ul>
             </div>
             <div>
