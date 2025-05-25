@@ -47,6 +47,21 @@ export const deposits = pgTable("deposits", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const tickets = pgTable("tickets", {
+  id: serial("id").primaryKey(),
+  ticketId: text("ticket_id").notNull().unique(),
+  userId: integer("user_id").notNull(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  subject: text("subject").notNull(),
+  message: text("message").notNull(),
+  status: text("status").notNull().default("Open"),
+  priority: text("priority").notNull().default("Medium"),
+  adminReply: text("admin_reply"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   password: true,
@@ -74,6 +89,12 @@ export const insertDepositSchema = createInsertSchema(deposits).omit({
   createdAt: true,
 });
 
+export const insertTicketSchema = createInsertSchema(tickets).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type LoginUser = z.infer<typeof loginSchema>;
 export type User = typeof users.$inferSelect;
@@ -86,3 +107,6 @@ export type Order = typeof orders.$inferSelect;
 
 export type InsertDeposit = z.infer<typeof insertDepositSchema>;
 export type Deposit = typeof deposits.$inferSelect;
+
+export type InsertTicket = z.infer<typeof insertTicketSchema>;
+export type Ticket = typeof tickets.$inferSelect;

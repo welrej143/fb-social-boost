@@ -3,13 +3,16 @@ import {
   services, 
   orders, 
   deposits, 
+  tickets,
   type User, 
   type Service, 
   type InsertService, 
   type Order, 
   type InsertOrder, 
   type Deposit, 
-  type InsertDeposit 
+  type InsertDeposit,
+  type Ticket,
+  type InsertTicket
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -37,6 +40,13 @@ export interface IStorage {
   getDeposit(id: number): Promise<Deposit | undefined>;
   updateDepositStatus(id: number, status: string): Promise<Deposit | undefined>;
   getUserDeposits(userId: number): Promise<Deposit[]>;
+  
+  createTicket(ticket: InsertTicket): Promise<Ticket>;
+  getTicket(ticketId: string): Promise<Ticket | undefined>;
+  getUserTickets(userId: number): Promise<Ticket[]>;
+  getAllTickets(): Promise<Ticket[]>;
+  updateTicketStatus(ticketId: string, status: string): Promise<Ticket | undefined>;
+  updateTicketReply(ticketId: string, adminReply: string, status?: string): Promise<Ticket | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -174,6 +184,47 @@ export class DatabaseStorage implements IStorage {
 
   async getUserDeposits(userId: number): Promise<Deposit[]> {
     return await db.select().from(deposits).where(eq(deposits.userId, userId));
+  }
+
+  async createTicket(insertTicket: InsertTicket): Promise<Ticket> {
+    const [ticket] = await db.insert(tickets).values(insertTicket).returning();
+    return ticket;
+  }
+
+  async getTicket(ticketId: string): Promise<Ticket | undefined> {
+    const [ticket] = await db.select().from(tickets).where(eq(tickets.ticketId, ticketId)).limit(1);
+    return ticket;
+  }
+
+  async getUserTickets(userId: number): Promise<Ticket[]> {
+    const userTickets = await db.select().from(tickets).where(eq(tickets.userId, userId));
+    return userTickets;
+  }
+
+  async getAllTickets(): Promise<Ticket[]> {
+    const allTickets = await db.select().from(tickets);
+    return allTickets;
+  }
+
+  async updateTicketStatus(ticketId: string, status: string): Promise<Ticket | undefined> {
+    const [updatedTicket] = await db.update(tickets)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(tickets.ticketId, ticketId))
+      .returning();
+    return updatedTicket;
+  }
+
+  async updateTicketReply(ticketId: string, adminReply: string, status?: string): Promise<Ticket | undefined> {
+    const updateData: any = { adminReply, updatedAt: new Date() };
+    if (status) {
+      updateData.status = status;
+    }
+    
+    const [updatedTicket] = await db.update(tickets)
+      .set(updateData)
+      .where(eq(tickets.ticketId, ticketId))
+      .returning();
+    return updatedTicket;
   }
 }
 
