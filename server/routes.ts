@@ -524,28 +524,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update order after PayPal payment
-  app.post("/api/orders/:orderId/payment", async (req, res) => {
+  // Process PayPal wallet deposit
+  app.post("/api/wallet/deposit", async (req: any, res) => {
     try {
-      const { orderId } = req.params;
-      const { paypalOrderId, status } = req.body;
-      
-      const order = await storage.getOrder(orderId);
-      if (!order) {
-        return res.status(404).json({ error: "Order not found" });
+      const { amount, paypalOrderId } = req.body;
+      const userId = req.session?.userId;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
       }
 
-      // Update order with PayPal info
-      const updatedOrder = await storage.createOrder({
-        ...order,
-        paypalOrderId,
-        status: status || "Paid"
+      if (!amount || !paypalOrderId) {
+        return res.status(400).json({ error: "Amount and PayPal order ID required" });
+      }
+
+      const depositAmount = parseFloat(amount);
+      if (depositAmount <= 0) {
+        return res.status(400).json({ error: "Invalid deposit amount" });
+      }
+
+      // Get current user balance
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Calculate new balance
+      const currentBalance = parseFloat(user.balance);
+      const newBalance = (currentBalance + depositAmount).toFixed(2);
+
+      // Update user balance
+      const updatedUser = await storage.updateUserBalance(userId, newBalance);
+      
+      // Create deposit record
+      await storage.createDeposit({
+        userId,
+        amount: depositAmount.toFixed(2),
+        status: "Completed",
+        paypalOrderId
       });
 
-      res.json({ success: true, order: updatedOrder });
+      res.json({ 
+        success: true, 
+        newBalance,
+        depositAmount: depositAmount.toFixed(2),
+        message: "Deposit completed successfully"
+      });
     } catch (error) {
-      console.error("Error updating order payment:", error);
-      res.status(500).json({ error: "Failed to update payment" });
+      console.error("Error processing deposit:", error);
+      res.status(500).json({ error: "Failed to process deposit" });
     }
   });
 

@@ -23,12 +23,16 @@ interface PayPalButtonProps {
   amount: string;
   currency: string;
   intent: string;
+  onSuccess?: (data: { newBalance: string; depositAmount: string }) => void;
+  onError?: (error: string) => void;
 }
 
 export default function PayPalButton({
   amount,
   currency,
   intent,
+  onSuccess,
+  onError,
 }: PayPalButtonProps) {
   const createOrder = async () => {
     const orderPayload = {
@@ -59,16 +63,47 @@ export default function PayPalButton({
 
   const onApprove = async (data: any) => {
     console.log("onApprove", data);
-    const orderData = await captureOrder(data.orderId);
-    console.log("Capture result", orderData);
+    try {
+      const orderData = await captureOrder(data.orderId);
+      console.log("Capture result", orderData);
+      
+      // Check if payment was successful
+      if (orderData.status === 'COMPLETED') {
+        // Process wallet deposit
+        const response = await fetch('/api/wallet/deposit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            amount: amount,
+            paypalOrderId: data.orderId
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+          onSuccess?.(result);
+        } else {
+          onError?.(result.error || 'Failed to process deposit');
+        }
+      } else {
+        onError?.('Payment was not completed');
+      }
+    } catch (error) {
+      console.error('Payment processing error:', error);
+      onError?.('An error occurred while processing payment');
+    }
   };
 
   const onCancel = async (data: any) => {
     console.log("onCancel", data);
   };
 
-  const onError = async (data: any) => {
+  const onPayPalError = async (data: any) => {
     console.log("onError", data);
+    onError?.('PayPal payment failed');
   };
 
   useEffect(() => {
@@ -108,7 +143,7 @@ export default function PayPalButton({
             sdkInstance.createPayPalOneTimePaymentSession({
               onApprove,
               onCancel,
-              onError,
+              onError: onPayPalError,
             });
 
       const onClick = async () => {

@@ -974,6 +974,21 @@ export default function Home() {
                       amount={depositAmount.toString()}
                       currency="USD"
                       intent="CAPTURE"
+                      onSuccess={(data) => {
+                        setUserBalance(data.newBalance);
+                        toast({
+                          title: "Deposit Successful",
+                          description: `$${data.depositAmount} has been added to your wallet. New balance: $${data.newBalance}`,
+                        });
+                        queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+                      }}
+                      onError={(error) => {
+                        toast({
+                          title: "Deposit Failed",
+                          description: error,
+                          variant: "destructive",
+                        });
+                      }}
                     />
                   </div>
                 </div>
