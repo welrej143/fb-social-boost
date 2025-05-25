@@ -790,15 +790,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin endpoint to get PayPal click analytics
   app.get("/api/admin/paypal-clicks", async (req: any, res) => {
     try {
-      if (!req.session?.userId) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
-      const user = await storage.getUser(req.session.userId);
-      if (!user || user.email !== 'admin@fbsocialboost.com') {
-        return res.status(403).json({ error: "Access denied" });
-      }
-
       const clicks = await storage.getAllPaypalClicks();
       res.json(clicks);
     } catch (error) {
