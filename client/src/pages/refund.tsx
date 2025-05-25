@@ -182,7 +182,7 @@ export default function Refund() {
             </div>
             <div className="mt-4">
               <Button onClick={() => window.location.href = '/support'} className="w-full md:w-auto">
-                Create Support Ticket
+                Contact Support
               </Button>
             </div>
           </CardContent>

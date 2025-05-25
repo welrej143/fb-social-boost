@@ -34,7 +34,7 @@ export default function Help() {
             </CardHeader>
             <CardContent>
               <Button onClick={() => window.location.href = '/support'} className="w-full">
-                Create a Support Ticket
+                Contact Support
               </Button>
             </CardContent>
           </Card>

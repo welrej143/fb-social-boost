@@ -33,14 +33,7 @@ export default function Support() {
                   </div>
                 </div>
                 
-                <div className="flex items-center p-4 bg-green-50 rounded-lg">
-                  <MessageCircle className="w-6 h-6 text-green-600 mr-3" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Live Chat</h3>
-                    <p className="text-gray-600">Available during business hours</p>
-                    <p className="text-sm text-gray-500">Monday - Friday, 9 AM - 6 PM EST</p>
-                  </div>
-                </div>
+
                 
                 <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                   <h4 className="font-semibold text-gray-900 mb-2">Before contacting support:</h4>
