@@ -4,6 +4,7 @@ import {
   orders, 
   deposits, 
   tickets,
+  paypalClicks,
   type User, 
   type Service, 
   type InsertService, 
@@ -12,10 +13,12 @@ import {
   type Deposit, 
   type InsertDeposit,
   type Ticket,
-  type InsertTicket
+  type InsertTicket,
+  type PaypalClick,
+  type InsertPaypalClick
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   // User operations for email/password auth
