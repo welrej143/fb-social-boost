@@ -641,10 +641,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
-      // Direct database insert to avoid schema validation issues
+      // Generate unique ticket ID
       const ticketId = `TKT-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
       
-      const result = await db.insert(tickets).values({
+      // Create ticket using raw SQL to bypass schema validation
+      const result = await storage.db.execute(sql`
+        INSERT INTO tickets (ticket_id, user_id, name, email, subject, message, status, priority, created_at, updated_at)
+        VALUES (${ticketId}, ${parseInt(userId)}, ${name}, ${email}, ${subject}, ${message}, 'Open', ${priority}, NOW(), NOW())
+        RETURNING *
+      `);
+
+      // Return success response
+      res.status(201).json({
+        id: Date.now(),
         ticketId,
         userId: parseInt(userId),
         name,
@@ -654,11 +663,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'Open',
         priority,
         adminReply: null,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }).returning();
-
-      res.status(201).json(result[0]);
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
     } catch (error) {
       console.error("Error creating ticket:", error);
       res.status(500).json({ error: "Failed to create ticket" });
