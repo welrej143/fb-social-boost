@@ -47,6 +47,10 @@ export interface IStorage {
   getAllTickets(): Promise<Ticket[]>;
   updateTicketStatus(ticketId: string, status: string): Promise<Ticket | undefined>;
   updateTicketReply(ticketId: string, adminReply: string, status?: string): Promise<Ticket | undefined>;
+  
+  createPaypalClick(click: InsertPaypalClick): Promise<PaypalClick>;
+  getAllPaypalClicks(): Promise<PaypalClick[]>;
+  getPaypalClicksByUser(userId: number): Promise<PaypalClick[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -238,6 +242,21 @@ export class DatabaseStorage implements IStorage {
       .where(eq(tickets.ticketId, ticketId))
       .returning();
     return updatedTicket;
+  }
+
+  async createPaypalClick(insertClick: InsertPaypalClick): Promise<PaypalClick> {
+    const [click] = await db.insert(paypalClicks).values(insertClick).returning();
+    return click;
+  }
+
+  async getAllPaypalClicks(): Promise<PaypalClick[]> {
+    return await db.select().from(paypalClicks).orderBy(desc(paypalClicks.clickedAt));
+  }
+
+  async getPaypalClicksByUser(userId: number): Promise<PaypalClick[]> {
+    return await db.select().from(paypalClicks)
+      .where(eq(paypalClicks.userId, userId))
+      .orderBy(desc(paypalClicks.clickedAt));
   }
 }
 

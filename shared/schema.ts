@@ -62,6 +62,17 @@ export const tickets = pgTable("tickets", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const paypalClicks = pgTable("paypal_clicks", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id"),
+  userEmail: varchar("user_email", { length: 255 }),
+  depositAmount: varchar("deposit_amount", { length: 20 }).notNull(),
+  sessionId: varchar("session_id", { length: 255 }),
+  ipAddress: varchar("ip_address", { length: 45 }),
+  userAgent: text("user_agent"),
+  clickedAt: timestamp("clicked_at").defaultNow().notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   password: true,
@@ -96,6 +107,11 @@ export const insertTicketSchema = createInsertSchema(tickets).omit({
   updatedAt: true,
 });
 
+export const insertPaypalClickSchema = createInsertSchema(paypalClicks).omit({
+  id: true,
+  clickedAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type LoginUser = z.infer<typeof loginSchema>;
 export type User = typeof users.$inferSelect;
@@ -111,3 +127,6 @@ export type Deposit = typeof deposits.$inferSelect;
 
 export type InsertTicket = z.infer<typeof insertTicketSchema>;
 export type Ticket = typeof tickets.$inferSelect;
+
+export type InsertPaypalClick = z.infer<typeof insertPaypalClickSchema>;
+export type PaypalClick = typeof paypalClicks.$inferSelect;
