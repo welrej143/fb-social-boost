@@ -195,6 +195,74 @@ export default function Home() {
     }
   };
 
+  // Footer navigation handlers
+  const handleServiceSelection = (serviceId: string) => {
+    const service = services.find(s => s.serviceId === serviceId);
+    if (service) {
+      handleServiceSelect(service);
+    } else {
+      toast({
+        title: "Service Not Available",
+        description: "This service is currently not available. Please try another service.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleOrderStatus = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Login Required",
+        description: "Please login first to check your order status",
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowOrders(true);
+    setShowWallet(false);
+  };
+
+  const handleFooterClick = (type: string) => {
+    const messages = {
+      help: {
+        title: "Help Center",
+        description: "For assistance, please contact our support team via live chat or email us at support@fbsocialboost.com"
+      },
+      contact: {
+        title: "Contact Us",
+        description: "Email: support@fbsocialboost.com | Live chat available 24/7 for immediate assistance"
+      },
+      chat: {
+        title: "Live Chat",
+        description: "Live chat support is available! Contact us via email at support@fbsocialboost.com for quick responses"
+      },
+      security: {
+        title: "Safe & Secure",
+        description: "We use industry-standard security measures to protect your data and ensure safe transactions"
+      },
+      privacy: {
+        title: "Privacy Policy",
+        description: "We respect your privacy and protect your personal information. Your data is never shared with third parties"
+      },
+      terms: {
+        title: "Terms of Service",
+        description: "By using our services, you agree to our terms. All orders are processed securely through verified APIs"
+      },
+      refund: {
+        title: "Refund Policy",
+        description: "We offer refunds for incomplete orders. Contact support within 24 hours if you experience any issues"
+      }
+    };
+
+    const message = messages[type as keyof typeof messages];
+    if (message) {
+      toast({
+        title: message.title,
+        description: message.description,
+      });
+    }
+  };
+
   const handleServiceSelect = (service: Service) => {
     if (!isAuthenticated) {
       toast({
@@ -923,30 +991,30 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">Services</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li>Page Likes</li>
-                <li>Page Followers</li>
-                <li>Profile Followers</li>
-                <li>Post Likes</li>
-                <li>Post Reactions</li>
-                <li>Video Views</li>
+                <li><button onClick={() => handleServiceSelection('1977')} className="hover:text-white transition-colors">Page Likes</button></li>
+                <li><button onClick={() => handleServiceSelection('1775')} className="hover:text-white transition-colors">Page Followers</button></li>
+                <li><button onClick={() => handleServiceSelection('55')} className="hover:text-white transition-colors">Profile Followers</button></li>
+                <li><button onClick={() => handleServiceSelection('221')} className="hover:text-white transition-colors">Post Likes</button></li>
+                <li><button onClick={() => handleServiceSelection('1779')} className="hover:text-white transition-colors">Post Reactions</button></li>
+                <li><button onClick={() => handleServiceSelection('254')} className="hover:text-white transition-colors">Video Views</button></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li>Help Center</li>
-                <li>Contact Us</li>
-                <li>Live Chat</li>
-                <li>Order Status</li>
+                <li><button onClick={() => handleFooterClick('help')} className="hover:text-white transition-colors">Help Center</button></li>
+                <li><button onClick={() => handleFooterClick('contact')} className="hover:text-white transition-colors">Contact Us</button></li>
+                <li><button onClick={() => handleFooterClick('chat')} className="hover:text-white transition-colors">Live Chat</button></li>
+                <li><button onClick={() => handleOrderStatus()} className="hover:text-white transition-colors">Order Status</button></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Security</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li>Safe & Secure</li>
-                <li>Privacy Policy</li>
-                <li>Terms of Service</li>
-                <li>Refund Policy</li>
+                <li><button onClick={() => handleFooterClick('security')} className="hover:text-white transition-colors">Safe & Secure</button></li>
+                <li><button onClick={() => handleFooterClick('privacy')} className="hover:text-white transition-colors">Privacy Policy</button></li>
+                <li><button onClick={() => handleFooterClick('terms')} className="hover:text-white transition-colors">Terms of Service</button></li>
+                <li><button onClick={() => handleFooterClick('refund')} className="hover:text-white transition-colors">Refund Policy</button></li>
               </ul>
             </div>
           </div>
