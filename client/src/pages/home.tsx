@@ -122,10 +122,14 @@ export default function Home() {
         credentials: "include",
         body: JSON.stringify(orderData),
       });
+      
+      const responseData = await response.json();
+      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // Throw the actual error message from the API
+        throw new Error(responseData.error || `HTTP error! status: ${response.status}`);
       }
-      return response.json();
+      return responseData;
     },
     onSuccess: (data) => {
       if (data.success) {
