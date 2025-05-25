@@ -148,6 +148,17 @@ export default function PayPalButton({
 
       const onClick = async () => {
         try {
+          // Track the PayPal button click
+          fetch('/api/paypal/track-click', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              depositAmount: amount
+            })
+          }).catch(error => console.error('Error tracking click:', error));
+
           const checkoutOptionsPromise = createOrder();
           await paypalCheckout.start(
             { paymentFlow: "auto" },

@@ -524,6 +524,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Track PayPal button clicks
+  app.post("/api/paypal/track-click", async (req: any, res) => {
+    try {
+      const { depositAmount } = req.body;
+      const userId = req.session?.userId;
+      const userEmail = req.session?.userEmail;
+      
+      // Track the click even if user is not logged in
+      await storage.createPaypalClick({
+        userId: userId || null,
+        userEmail: userEmail || null,
+        depositAmount: depositAmount || "0",
+        sessionId: req.sessionID || null,
+        ipAddress: req.ip || req.connection?.remoteAddress || null,
+        userAgent: req.get('User-Agent') || null
+      });
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error tracking PayPal click:", error);
+      res.status(500).json({ error: "Failed to track click" });
+    }
+  });
+
   // Process PayPal wallet deposit
   app.post("/api/wallet/deposit", async (req: any, res) => {
     try {
