@@ -7,6 +7,11 @@ import Home from "@/pages/home";
 import Login from "@/pages/login";
 import Account from "@/pages/account";
 import Admin from "@/pages/admin";
+import Help from "@/pages/help";
+import Support from "@/pages/support";
+import Privacy from "@/pages/privacy";
+import Terms from "@/pages/terms";
+import Refund from "@/pages/refund";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -16,6 +21,11 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/account" component={Account} />
       <Route path="/admin" component={Admin} />
+      <Route path="/help" component={Help} />
+      <Route path="/support" component={Support} />
+      <Route path="/privacy" component={Privacy} />
+      <Route path="/terms" component={Terms} />
+      <Route path="/refund" component={Refund} />
       <Route component={NotFound} />
     </Switch>
   );

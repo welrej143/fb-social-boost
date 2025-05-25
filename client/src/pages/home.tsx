@@ -972,7 +972,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -985,31 +985,19 @@ export default function Home() {
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Services</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><button onClick={() => handleServiceSelection('1977')} className="hover:text-white transition-colors">Page Likes</button></li>
-                <li><button onClick={() => handleServiceSelection('1775')} className="hover:text-white transition-colors">Page Followers</button></li>
-                <li><button onClick={() => handleServiceSelection('55')} className="hover:text-white transition-colors">Profile Followers</button></li>
-                <li><button onClick={() => handleServiceSelection('221')} className="hover:text-white transition-colors">Post Likes</button></li>
-                <li><button onClick={() => handleServiceSelection('1779')} className="hover:text-white transition-colors">Post Reactions</button></li>
-                <li><button onClick={() => handleServiceSelection('254')} className="hover:text-white transition-colors">Video Views</button></li>
-              </ul>
-            </div>
-            <div>
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><button onClick={() => handleFooterClick('help')} className="hover:text-white transition-colors">Help Center</button></li>
-                <li><button onClick={() => handleFooterClick('ticket')} className="hover:text-white transition-colors">Create a Ticket</button></li>
+                <li><a href="/help" className="hover:text-white transition-colors">Help Center</a></li>
+                <li><a href="/support" className="hover:text-white transition-colors">Create a Ticket</a></li>
                 <li><button onClick={() => handleOrderStatus()} className="hover:text-white transition-colors">Order Status</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Security</h4>
+              <h4 className="font-semibold mb-4">Legal</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><button onClick={() => handleFooterClick('security')} className="hover:text-white transition-colors">Safe & Secure</button></li>
-                <li><button onClick={() => handleFooterClick('privacy')} className="hover:text-white transition-colors">Privacy Policy</button></li>
-                <li><button onClick={() => handleFooterClick('terms')} className="hover:text-white transition-colors">Terms of Service</button></li>
-                <li><button onClick={() => handleFooterClick('refund')} className="hover:text-white transition-colors">Refund Policy</button></li>
+                <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="/terms" className="hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="/refund" className="hover:text-white transition-colors">Refund Policy</a></li>
               </ul>
             </div>
           </div>
