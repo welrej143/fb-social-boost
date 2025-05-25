@@ -40,6 +40,22 @@ export default function Support() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Add loading state for auth
+  if (user === undefined) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-300 rounded w-48 mb-6 mx-auto"></div>
+              <div className="h-4 bg-gray-300 rounded w-64 mx-auto"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   
   const [formData, setFormData] = useState({
     name: '',
@@ -52,9 +68,18 @@ export default function Support() {
   const [showForm, setShowForm] = useState(false);
 
   // Fetch user's tickets
-  const { data: tickets = [], isLoading: ticketsLoading } = useQuery({
+  const { data: tickets = [], isLoading: ticketsLoading, error: ticketsError } = useQuery({
     queryKey: ['/api/tickets/user', user?.id],
-    queryFn: () => apiRequest(`/api/tickets/user/${user?.id}`),
+    queryFn: async () => {
+      if (!user?.id) return [];
+      try {
+        const response = await fetch(`/api/tickets/user/${user.id}`);
+        if (!response.ok) return [];
+        return await response.json();
+      } catch {
+        return [];
+      }
+    },
     enabled: !!user?.id,
   });
 
