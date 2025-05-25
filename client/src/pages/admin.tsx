@@ -41,6 +41,11 @@ export default function Admin() {
     queryKey: ["/api/admin/orders"],
   });
 
+  // Fetch PayPal click analytics
+  const { data: paypalClicks, isLoading: clicksLoading } = useQuery({
+    queryKey: ["/api/admin/paypal-clicks"],
+  });
+
   // Update user balance mutation
   const updateBalanceMutation = useMutation({
     mutationFn: async ({ userId, balance }: { userId: number; balance: string }) => {
@@ -175,6 +180,7 @@ export default function Admin() {
           <TabsList>
             <TabsTrigger value="users">Users Management</TabsTrigger>
             <TabsTrigger value="orders">Orders Management</TabsTrigger>
+            <TabsTrigger value="analytics">PayPal Analytics</TabsTrigger>
           </TabsList>
 
           {/* Users Tab */}
@@ -309,6 +315,109 @@ export default function Admin() {
                     <p className="text-center text-gray-500 py-8">No orders found</p>
                   )}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* PayPal Analytics Tab */}
+          <TabsContent value="analytics">
+            <Card>
+              <CardHeader>
+                <CardTitle>PayPal Click Analytics</CardTitle>
+                <CardDescription>
+                  Track PayPal button clicks and user engagement
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {clicksLoading ? (
+                  <div className="text-center py-8">Loading click data...</div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Analytics Summary */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-blue-600">
+                              {paypalClicks?.length || 0}
+                            </div>
+                            <p className="text-sm text-muted-foreground">Total Clicks</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-green-600">
+                              {paypalClicks?.filter((click: any) => click.userId).length || 0}
+                            </div>
+                            <p className="text-sm text-muted-foreground">Logged-in Users</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card>
+                        <CardContent className="p-4">
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-purple-600">
+                              ${paypalClicks?.reduce((sum: number, click: any) => 
+                                sum + parseFloat(click.depositAmount || 0), 0).toFixed(2) || '0.00'}
+                            </div>
+                            <p className="text-sm text-muted-foreground">Total Intent Value</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Click Details */}
+                    <div className="space-y-3">
+                      {paypalClicks?.map((click: any) => (
+                        <div key={click.id} className="border rounded-lg p-4 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-4">
+                              <Badge variant={click.userId ? "default" : "secondary"}>
+                                {click.userId ? "Logged In" : "Anonymous"}
+                              </Badge>
+                              <span className="font-medium">${click.depositAmount}</span>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm text-gray-600">
+                                {new Date(click.clickedAt).toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="text-gray-600">User:</span>
+                              <p className="font-medium">
+                                {click.userEmail || `User ID: ${click.userId}` || "Anonymous"}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-gray-600">Session:</span>
+                              <p className="font-medium text-xs break-all">
+                                {click.sessionId?.substring(0, 20)}...
+                              </p>
+                            </div>
+                          </div>
+                          
+                          {click.ipAddress && (
+                            <div>
+                              <span className="text-gray-600 text-sm">IP Address:</span>
+                              <p className="text-sm">{click.ipAddress}</p>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      
+                      {paypalClicks?.length === 0 && (
+                        <p className="text-center text-gray-500 py-8">No PayPal clicks recorded yet</p>
+                      )}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
