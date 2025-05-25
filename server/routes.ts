@@ -636,15 +636,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/tickets', async (req, res) => {
     try {
       const ticketData = insertTicketSchema.parse(req.body);
-      
-      // Generate unique ticket ID
-      const ticketId = `TKT-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
-      
-      const ticket = await storage.createTicket({
-        ...ticketData,
-        ticketId
-      });
-      
+      const ticket = await storage.createTicket(ticketData);
       res.status(201).json(ticket);
     } catch (error) {
       console.error("Error creating ticket:", error);
