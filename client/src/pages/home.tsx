@@ -88,6 +88,7 @@ export default function Home() {
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
   const [depositAmount, setDepositAmount] = useState(10);
   const [userBalance, setUserBalance] = useState("0.00");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -420,11 +421,99 @@ export default function Home() {
                 </Button>
               )}
             </div>
-            <button className="md:hidden text-gray-600">
+            <button 
+              className="md:hidden text-gray-600 hover:text-blue-600 transition-colors"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
               <Menu className="w-6 h-6" />
             </button>
           </div>
         </div>
+        
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
+            <div className="px-4 py-3 space-y-3">
+              <button 
+                onClick={() => { 
+                  setShowOrders(false); 
+                  setShowWallet(false); 
+                  handleBackToServices(); 
+                  setIsMobileMenuOpen(false);
+                }}
+                className="block w-full text-left text-gray-600 hover:text-blue-600 transition-colors py-2"
+              >
+                Services
+              </button>
+              <button 
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    toast({
+                      title: "Login Required",
+                      description: "Please login first to view your orders",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  setShowOrders(true); 
+                  setShowWallet(false);
+                  setIsMobileMenuOpen(false);
+                }}
+                className="block w-full text-left text-gray-600 hover:text-blue-600 transition-colors py-2"
+              >
+                My Orders
+              </button>
+              <button 
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    toast({
+                      title: "Login Required", 
+                      description: "Please login first to access your wallet",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  setShowWallet(true); 
+                  setShowOrders(false);
+                  setIsMobileMenuOpen(false);
+                }}
+                className="flex items-center space-x-2 w-full text-left text-gray-600 hover:text-blue-600 transition-colors py-2"
+              >
+                <Wallet className="w-4 h-4" />
+                <span>Wallet</span>
+              </button>
+              {isAuthenticated && (
+                <div className="bg-green-100 text-green-700 px-3 py-2 rounded-lg text-sm font-medium">
+                  Balance: ${userBalance}
+                </div>
+              )}
+              
+              {isAuthenticated ? (
+                <Button
+                  onClick={() => {
+                    window.location.href = '/account';
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700"
+                >
+                  <User className="w-4 h-4" />
+                  <span>My Account</span>
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => {
+                    window.location.href = '/login';
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Login</span>
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
       </nav>
 
       {!showOrders && !showWallet ? (
