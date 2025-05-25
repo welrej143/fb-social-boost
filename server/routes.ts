@@ -147,10 +147,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     await capturePaypalOrder(req, res);
   });
 
-  // Get all services with current rates (simplified version)
+  // Get all services - fetch from SMM API and save to database, then serve from database
   app.get("/api/services", async (req, res) => {
     try {
-      // Return hardcoded Facebook services with live rates from SMM API
+      // First try to get services from database
+      const dbServices = await storage.getAllServices();
+      
+      // If we have recent services in database (less than 1 hour old), return them
+      if (dbServices.length > 0) {
+        const latestService = dbServices[0];
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+        
+        if (latestService.updatedAt && new Date(latestService.updatedAt) > oneHourAgo) {
+          const formattedServices = dbServices.map(service => ({
+            serviceId: service.serviceId,
+            name: service.name,
+            rate: service.rate,
+            originalRate: (parseFloat(service.rate) / 5).toFixed(2),
+            minOrder: 100,
+            maxOrder: 100000
+          }));
+          return res.json(formattedServices);
+        }
+      }
+
+      // Fetch fresh data from SMM Valley API
       const response = await fetch(SMM_API_BASE, {
         method: 'POST',
         headers: {
@@ -169,36 +190,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const smmServices = await response.json();
       const facebookServices = [];
 
-      // Process each Facebook service quickly
+      // Process and save each Facebook service to database
       for (const [serviceId, serviceName] of Object.entries(FACEBOOK_SERVICES)) {
         const smmService = smmServices.find((s: any) => s.service === serviceId);
         
-        if (smmService) {
-          const ourRate = (parseFloat(smmService.rate) * 5).toFixed(2);
-          facebookServices.push({
-            serviceId,
-            name: serviceName,
-            rate: ourRate,
-            originalRate: smmService.rate,
-            minOrder: smmService.min || 100,
-            maxOrder: smmService.max || 100000
-          });
-        } else {
-          facebookServices.push({
-            serviceId,
-            name: serviceName,
-            rate: "N/A",
-            originalRate: "N/A",
-            minOrder: 1000,
-            maxOrder: 100000
-          });
+        let ourRate = "2.00"; // Default rate
+        if (smmService && smmService.rate) {
+          ourRate = (parseFloat(smmService.rate) * 5).toFixed(2);
         }
+
+        // Save/update service in database
+        await storage.createOrUpdateService({
+          serviceId,
+          name: serviceName,
+          rate: ourRate
+        });
+
+        facebookServices.push({
+          serviceId,
+          name: serviceName,
+          rate: ourRate,
+          originalRate: smmService?.rate || (parseFloat(ourRate) / 5).toFixed(2),
+          minOrder: smmService?.min || 100,
+          maxOrder: smmService?.max || 100000
+        });
       }
 
-      // Return immediately without any database operations
       res.json(facebookServices);
     } catch (error) {
       console.error("Error fetching services:", error);
+      
+      // Fallback to database services if API fails
+      try {
+        const dbServices = await storage.getAllServices();
+        if (dbServices.length > 0) {
+          const formattedServices = dbServices.map(service => ({
+            serviceId: service.serviceId,
+            name: service.name,
+            rate: service.rate,
+            originalRate: (parseFloat(service.rate) / 5).toFixed(2),
+            minOrder: 100,
+            maxOrder: 100000
+          }));
+          return res.json(formattedServices);
+        }
+      } catch (dbError) {
+        console.error("Database fallback failed:", dbError);
+      }
+      
       res.status(500).json({ error: "Failed to fetch services" });
     }
   });
