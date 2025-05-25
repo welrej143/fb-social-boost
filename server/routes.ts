@@ -635,11 +635,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Ticket routes
   app.post('/api/tickets', async (req, res) => {
     try {
+      console.log("Received ticket data:", req.body);
       const ticketData = insertTicketSchema.parse(req.body);
+      console.log("Parsed ticket data:", ticketData);
       const ticket = await storage.createTicket(ticketData);
       res.status(201).json(ticket);
     } catch (error) {
       console.error("Error creating ticket:", error);
+      if (error.errors) {
+        console.error("Validation errors:", error.errors);
+      }
       res.status(500).json({ error: "Failed to create ticket" });
     }
   });

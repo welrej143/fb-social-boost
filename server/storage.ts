@@ -189,9 +189,15 @@ export class DatabaseStorage implements IStorage {
   async createTicket(insertTicket: InsertTicket): Promise<Ticket> {
     const ticketId = `TKT-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
     const [ticket] = await db.insert(tickets).values({
-      ...insertTicket,
       ticketId,
+      userId: insertTicket.userId,
+      name: insertTicket.name,
+      email: insertTicket.email,
+      subject: insertTicket.subject,
+      message: insertTicket.message,
       status: insertTicket.status || 'Open',
+      priority: insertTicket.priority || 'Medium',
+      adminReply: insertTicket.adminReply || null,
       createdAt: new Date(),
       updatedAt: new Date()
     }).returning();
