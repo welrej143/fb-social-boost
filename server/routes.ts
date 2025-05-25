@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { json } from "express";
 import { storage } from "./storage";
 import { getSession, isAuthenticated, hashPassword, comparePassword } from "./auth";
-import { insertOrderSchema, insertDepositSchema, insertUserSchema, loginSchema } from "@shared/schema";
+import { insertOrderSchema, insertDepositSchema, insertUserSchema, loginSchema, insertTicketSchema } from "@shared/schema";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 
 const SMM_API_BASE = process.env.SMM_API_URL || "https://smmvaly.com/api/v2";
@@ -629,6 +629,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating user balance:", error);
       res.status(500).json({ error: "Failed to update balance" });
+    }
+  });
+
+  // Ticket routes
+  app.post('/api/tickets', async (req, res) => {
+    try {
+      const ticketData = insertTicketSchema.parse(req.body);
+      
+      // Generate unique ticket ID
+      const ticketId = `TKT-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+      
+      const ticket = await storage.createTicket({
+        ...ticketData,
+        ticketId
+      });
+      
+      res.status(201).json(ticket);
+    } catch (error) {
+      console.error("Error creating ticket:", error);
+      res.status(500).json({ error: "Failed to create ticket" });
+    }
+  });
+
+  app.get('/api/tickets/user/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const tickets = await storage.getUserTickets(parseInt(userId));
+      res.json(tickets);
+    } catch (error) {
+      console.error("Error fetching user tickets:", error);
+      res.status(500).json({ error: "Failed to fetch tickets" });
+    }
+  });
+
+  app.get('/api/admin/tickets', async (req, res) => {
+    try {
+      const tickets = await storage.getAllTickets();
+      res.json(tickets);
+    } catch (error) {
+      console.error("Error fetching all tickets:", error);
+      res.status(500).json({ error: "Failed to fetch tickets" });
+    }
+  });
+
+  app.patch('/api/admin/tickets/:ticketId/status', async (req, res) => {
+    try {
+      const { ticketId } = req.params;
+      const { status } = req.body;
+      
+      const updatedTicket = await storage.updateTicketStatus(ticketId, status);
+      
+      if (!updatedTicket) {
+        return res.status(404).json({ error: "Ticket not found" });
+      }
+      
+      res.json(updatedTicket);
+    } catch (error) {
+      console.error("Error updating ticket status:", error);
+      res.status(500).json({ error: "Failed to update ticket status" });
+    }
+  });
+
+  app.patch('/api/admin/tickets/:ticketId/reply', async (req, res) => {
+    try {
+      const { ticketId } = req.params;
+      const { adminReply, status } = req.body;
+      
+      const updatedTicket = await storage.updateTicketReply(ticketId, adminReply, status);
+      
+      if (!updatedTicket) {
+        return res.status(404).json({ error: "Ticket not found" });
+      }
+      
+      res.json(updatedTicket);
+    } catch (error) {
+      console.error("Error updating ticket reply:", error);
+      res.status(500).json({ error: "Failed to update ticket reply" });
     }
   });
 
