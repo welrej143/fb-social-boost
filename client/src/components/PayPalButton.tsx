@@ -159,6 +159,11 @@ export default function PayPalButton({
             })
           }).catch(error => console.error('Error tracking click:', error));
 
+          // Track Google Ads conversion
+          if (typeof window.gtag_report_conversion === 'function') {
+            window.gtag_report_conversion();
+          }
+
           const checkoutOptionsPromise = createOrder();
           await paypalCheckout.start(
             { paymentFlow: "auto" },
