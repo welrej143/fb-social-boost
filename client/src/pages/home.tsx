@@ -226,15 +226,11 @@ export default function Home() {
     const messages = {
       help: {
         title: "Help Center",
-        description: "For assistance, please contact our support team via live chat or email us at support@fbsocialboost.com"
+        description: "For assistance, please create a support ticket or email us at support@fbsocialboost.com"
       },
-      contact: {
-        title: "Contact Us",
-        description: "Email: support@fbsocialboost.com | Live chat available 24/7 for immediate assistance"
-      },
-      chat: {
-        title: "Live Chat",
-        description: "Live chat support is available! Contact us via email at support@fbsocialboost.com for quick responses"
+      ticket: {
+        title: "Create a Ticket",
+        description: "Need help? Email us at support@fbsocialboost.com with your issue and we'll respond within 24 hours"
       },
       security: {
         title: "Safe & Secure",
@@ -1003,8 +999,7 @@ export default function Home() {
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li><button onClick={() => handleFooterClick('help')} className="hover:text-white transition-colors">Help Center</button></li>
-                <li><button onClick={() => handleFooterClick('contact')} className="hover:text-white transition-colors">Contact Us</button></li>
-                <li><button onClick={() => handleFooterClick('chat')} className="hover:text-white transition-colors">Live Chat</button></li>
+                <li><button onClick={() => handleFooterClick('ticket')} className="hover:text-white transition-colors">Create a Ticket</button></li>
                 <li><button onClick={() => handleOrderStatus()} className="hover:text-white transition-colors">Order Status</button></li>
               </ul>
             </div>
