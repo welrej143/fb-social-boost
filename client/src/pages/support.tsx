@@ -1,102 +1,7 @@
-import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
-import { Mail, MessageCircle, Clock, Ticket, Calendar } from "lucide-react";
-
-interface TicketData {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-  priority: string;
-  userId: number;
-}
+import { MessageCircle, Clock } from "lucide-react";
 
 export default function Support() {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-    priority: 'Medium'
-  });
-
-  const [showForm, setShowForm] = useState(false);
-
-  // Create ticket mutation
-  const createTicketMutation = useMutation({
-    mutationFn: async (data: TicketData) => {
-      const response = await fetch('/api/tickets', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error);
-      }
-      
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Ticket Created",
-        description: "Your support ticket has been created successfully.",
-      });
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: '',
-        priority: 'Medium'
-      });
-      setShowForm(false);
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create ticket",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Use user ID if logged in, otherwise use 1 as default
-    const userId = user?.id || 1;
-
-    createTicketMutation.mutate({
-      ...formData,
-      userId
-    });
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4">
@@ -106,114 +11,47 @@ export default function Support() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Create Ticket Section */}
+          {/* Contact Us Section */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
                 <MessageCircle className="w-5 h-5 mr-2 text-blue-600" />
-                Create Support Ticket
+                Contact Us
               </CardTitle>
               <CardDescription>
-                Get personalized help from our support team
+                Get in touch with our support team
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {!user ? (
-                <div className="text-center py-6">
-                  <p className="text-gray-600 mb-4">
-                    Please log in to create a support ticket
-                  </p>
-                  <Button 
-                    onClick={() => window.location.href = '/login'} 
-                    className="w-full"
-                  >
-                    Log In to Create Ticket
-                  </Button>
+              <div className="space-y-4">
+                <div className="flex items-center p-4 bg-blue-50 rounded-lg">
+                  <MessageCircle className="w-6 h-6 text-blue-600 mr-3" />
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Email Support</h3>
+                    <p className="text-gray-600">support@fbsocialboost.com</p>
+                    <p className="text-sm text-gray-500">Response within 24 hours</p>
+                  </div>
                 </div>
-              ) : !showForm ? (
-                <Button onClick={() => setShowForm(true)} className="w-full">
-                  Create New Ticket
-                </Button>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
+                
+                <div className="flex items-center p-4 bg-green-50 rounded-lg">
+                  <MessageCircle className="w-6 h-6 text-green-600 mr-3" />
                   <div>
-                    <Label htmlFor="name">Full Name *</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="Your full name"
-                      required
-                    />
+                    <h3 className="font-semibold text-gray-900">Live Chat</h3>
+                    <p className="text-gray-600">Available during business hours</p>
+                    <p className="text-sm text-gray-500">Monday - Friday, 9 AM - 6 PM EST</p>
                   </div>
-                  
-                  <div>
-                    <Label htmlFor="email">Email Address *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                      placeholder="your.email@example.com"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="priority">Priority</Label>
-                    <Select value={formData.priority} onValueChange={(value) => setFormData(prev => ({ ...prev, priority: value }))}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Low">Low</SelectItem>
-                        <SelectItem value="Medium">Medium</SelectItem>
-                        <SelectItem value="High">High</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="subject">Subject *</Label>
-                    <Input
-                      id="subject"
-                      value={formData.subject}
-                      onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
-                      placeholder="Brief description of your issue"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="message">Message *</Label>
-                    <Textarea
-                      id="message"
-                      value={formData.message}
-                      onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                      placeholder="Please describe your issue in detail..."
-                      rows={4}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <Button 
-                      type="submit" 
-                      disabled={createTicketMutation.isPending}
-                      className="flex-1"
-                    >
-                      {createTicketMutation.isPending ? 'Creating...' : 'Submit Ticket'}
-                    </Button>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => setShowForm(false)}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </form>
-              )}
+                </div>
+                
+                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                  <h4 className="font-semibold text-gray-900 mb-2">Before contacting support:</h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Check our FAQ section below</li>
+                    <li>• Include your order ID if applicable</li>
+                    <li>• Describe the issue in detail</li>
+                    <li>• Mention any error messages you've seen</li>
+                  </ul>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -263,20 +101,22 @@ export default function Support() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4">
+                <div className="space-y-4">
                   <div>
-                    <p className="font-medium">Monday - Friday</p>
+                    <h3 className="font-semibold text-gray-900">Monday - Friday</h3>
                     <p className="text-gray-600">9:00 AM - 6:00 PM EST</p>
                   </div>
+                  
                   <div>
-                    <p className="font-medium">Saturday - Sunday</p>
+                    <h3 className="font-semibold text-gray-900">Saturday - Sunday</h3>
                     <p className="text-gray-600">10:00 AM - 4:00 PM EST</p>
                   </div>
-                  <div className="pt-2 border-t">
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-gray-600" />
-                      <span className="text-sm text-gray-600">support@fbsocialboost.com</span>
-                    </div>
+                  
+                  <div className="flex items-center mt-6 p-3 bg-blue-50 rounded-lg">
+                    <MessageCircle className="w-5 h-5 text-blue-600 mr-2" />
+                    <p className="text-sm text-gray-600">
+                      <strong>support@fbsocialboost.com</strong>
+                    </p>
                   </div>
                 </div>
               </CardContent>
