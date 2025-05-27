@@ -227,11 +227,11 @@ export default function Home() {
     const messages = {
       help: {
         title: "Help Center",
-        description: "For assistance, please email us at support@fbsocialboost.com or visit our support center"
+        description: "For assistance, please email us at socialboostertool01@gmail.com or visit our support center"
       },
       ticket: {
         title: "Contact Support",
-        description: "Need help? Email us at support@fbsocialboost.com with your issue and we'll respond within 24 hours"
+        description: "Need help? Email us at socialboostertool01@gmail.com with your issue and we'll respond within 24 hours"
       },
       security: {
         title: "Safe & Secure",

@@ -129,7 +129,7 @@ export default function Refund() {
           <CardContent className="space-y-4">
             <div>
               <h3 className="font-semibold text-gray-900 mb-2">Step 1: Contact Support</h3>
-              <p className="text-gray-600">Email our support team at support@fbsocialboost.com within 24 hours of your order. Include your order ID and reason for the refund request.</p>
+              <p className="text-gray-600">Email our support team at socialboostertool01@gmail.com within 24 hours of your order. Include your order ID and reason for the refund request.</p>
             </div>
             
             <div>
@@ -177,7 +177,7 @@ export default function Refund() {
             </p>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-blue-800 font-medium">Email Support</p>
-              <p className="text-blue-600">support@fbsocialboost.com</p>
+              <p className="text-blue-600">socialboostertool01@gmail.com</p>
               <p className="text-blue-600 text-sm mt-1">Include your order ID for faster processing</p>
             </div>
             <div className="mt-4">

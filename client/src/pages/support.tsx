@@ -28,7 +28,7 @@ export default function Support() {
                   <MessageCircle className="w-6 h-6 text-blue-600 mr-3" />
                   <div>
                     <h3 className="font-semibold text-gray-900">Email Support</h3>
-                    <p className="text-gray-600">support@fbsocialboost.com</p>
+                    <p className="text-gray-600">socialboostertool01@gmail.com</p>
                     <p className="text-sm text-gray-500">Response within 24 hours</p>
                   </div>
                 </div>
@@ -108,7 +108,7 @@ export default function Support() {
                   <div className="flex items-center mt-6 p-3 bg-blue-50 rounded-lg">
                     <MessageCircle className="w-5 h-5 text-blue-600 mr-2" />
                     <p className="text-sm text-gray-600">
-                      <strong>support@fbsocialboost.com</strong>
+                      <strong>socialboostertool01@gmail.com</strong>
                     </p>
                   </div>
                 </div>

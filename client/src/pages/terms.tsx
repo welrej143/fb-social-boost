@@ -152,7 +152,7 @@ export default function Terms() {
             </p>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-blue-800 font-medium">Email Support</p>
-              <p className="text-blue-600">support@fbsocialboost.com</p>
+              <p className="text-blue-600">socialboostertool01@gmail.com</p>
               <p className="text-blue-600 text-sm mt-1">Response within 24 hours</p>
             </div>
           </CardContent>
