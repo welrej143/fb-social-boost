@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
-import { Users, DollarSign, ShoppingCart, TrendingUp, Edit2, Save, X } from "lucide-react";
+import { Users, DollarSign, ShoppingCart, TrendingUp, Edit2, Save, X, MessageCircle } from "lucide-react";
 import type { User, Order } from "@shared/schema";
 
 interface AdminStats {
@@ -117,8 +117,19 @@ export default function Admin() {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-          <p className="text-gray-600">Manage your Facebook growth platform</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
+              <p className="text-gray-600">Manage your Facebook growth platform</p>
+            </div>
+            <Button 
+              onClick={() => window.location.href = '/admin/chat'}
+              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>Live Chat Support</span>
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}

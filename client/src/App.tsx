@@ -7,6 +7,7 @@ import Home from "@/pages/home";
 import Login from "@/pages/login";
 import Account from "@/pages/account";
 import Admin from "@/pages/admin";
+import AdminChat from "@/pages/admin-chat";
 import Help from "@/pages/help";
 import Support from "@/pages/support";
 import Privacy from "@/pages/privacy";
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/account" component={Account} />
       <Route path="/admin" component={Admin} />
+      <Route path="/admin/chat" component={AdminChat} />
       <Route path="/help" component={Help} />
       <Route path="/support" component={Support} />
       <Route path="/privacy" component={Privacy} />

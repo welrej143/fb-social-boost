@@ -848,6 +848,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Chat API Routes
+  app.post('/api/chat/session', async (req, res) => {
+    try {
+      const { sessionId, userId, userEmail, userName } = req.body;
+      
+      // Check if session already exists
+      const existingSession = await storage.getChatSession(sessionId);
+      if (existingSession) {
+        return res.json(existingSession);
+      }
+      
+      const session = await storage.createChatSession({
+        sessionId,
+        userId: userId || null,
+        userEmail: userEmail || null,
+        userName: userName || null,
+        status: 'Active'
+      });
+      
+      res.status(201).json(session);
+    } catch (error) {
+      console.error("Error creating chat session:", error);
+      res.status(500).json({ error: "Failed to create chat session" });
+    }
+  });
+
+  app.get('/api/admin/chat/sessions', async (req, res) => {
+    try {
+      const sessions = await storage.getAllChatSessions();
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching chat sessions:", error);
+      res.status(500).json({ error: "Failed to fetch chat sessions" });
+    }
+  });
+
+  app.post('/api/chat/message', async (req, res) => {
+    try {
+      const { sessionId, senderId, senderName, senderType, message } = req.body;
+      
+      if (!sessionId || !senderName || !senderType || !message) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      
+      const chatMessage = await storage.createChatMessage({
+        sessionId,
+        senderId: senderId || null,
+        senderName,
+        senderType,
+        message,
+        isRead: 0
+      });
+      
+      // Update session's last message time
+      await storage.updateChatSessionStatus(sessionId, 'Active');
+      
+      res.status(201).json(chatMessage);
+    } catch (error) {
+      console.error("Error creating chat message:", error);
+      res.status(500).json({ error: "Failed to send message" });
+    }
+  });
+
+  app.get('/api/chat/messages/:sessionId', async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const messages = await storage.getChatMessages(sessionId);
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching chat messages:", error);
+      res.status(500).json({ error: "Failed to fetch messages" });
+    }
+  });
+
+  app.patch('/api/chat/messages/:sessionId/read', async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const { senderType } = req.body;
+      
+      await storage.markMessagesAsRead(sessionId, senderType);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error marking messages as read:", error);
+      res.status(500).json({ error: "Failed to mark messages as read" });
+    }
+  });
+
   // Admin endpoint to get PayPal click analytics
   app.get("/api/admin/paypal-clicks", async (req: any, res) => {
     try {
