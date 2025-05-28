@@ -157,7 +157,13 @@ export default function LiveChat() {
         }),
       });
       if (!response.ok) throw new Error("Failed to send message");
-      return response.json();
+      
+      try {
+        return await response.json();
+      } catch (parseError) {
+        // If we get a 200 but can't parse JSON, consider it successful
+        return { success: true };
+      }
     },
     onSuccess: () => {
       setMessage("");
