@@ -61,11 +61,26 @@ export default function LiveChat() {
     scrollToBottom();
   }, []);
 
-  // Initialize session ID
+  // Initialize session ID and create session immediately
   useEffect(() => {
     if (!sessionId) {
       const newSessionId = `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       setSessionId(newSessionId);
+      
+      // Auto-create session as soon as chat opens
+      fetch("/api/chat/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          sessionId: newSessionId,
+          userName: "Anonymous User",
+          userEmail: null,
+          userId: null,
+        }),
+      }).then(() => {
+        setHasStartedChat(true);
+      }).catch(console.error);
     }
   }, [sessionId]);
 
