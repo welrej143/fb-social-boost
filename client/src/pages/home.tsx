@@ -28,7 +28,12 @@ import {
   DollarSign,
   LogIn,
   LogOut,
-  User
+  User,
+  Timer,
+  Zap,
+  Gift,
+  TrendingUp,
+  Flame
 } from "lucide-react";
 
 interface Service {
@@ -89,6 +94,9 @@ export default function Home() {
   const [depositAmount, setDepositAmount] = useState(1);
   const [userBalance, setUserBalance] = useState("0.00");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(24 * 60 * 60); // 24 hours in seconds
+  const [showSpecialOffer, setShowSpecialOffer] = useState(true);
+  const [isFirstTimeDeposit, setIsFirstTimeDeposit] = useState(true);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -100,6 +108,29 @@ export default function Home() {
       setUserBalance(user.balance);
     }
   }, [user]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        if (prevTime <= 1) {
+          // Reset to 24 hours when timer reaches 0
+          return 24 * 60 * 60;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Format time for display
+  const formatTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Fetch services
   const { data: services = [], isLoading: servicesLoading } = useQuery<Service[]>({
@@ -516,6 +547,59 @@ export default function Home() {
         )}
       </nav>
 
+      {/* Special Discount Banner */}
+      {showSpecialOffer && (
+        <div className="bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white py-3 px-4 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 via-transparent to-orange-500/20 animate-pulse"></div>
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between relative z-10">
+            <div className="flex items-center space-x-3 mb-2 md:mb-0">
+              <div className="flex items-center space-x-2">
+                <Flame className="w-5 h-5 animate-bounce text-yellow-300" />
+                <span className="font-bold text-lg">🔥 FLASH SALE</span>
+                <Flame className="w-5 h-5 animate-bounce text-yellow-300" />
+              </div>
+              <span className="text-sm md:text-base font-medium">
+                Get UP TO 75% OFF on all services!
+              </span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <Timer className="w-4 h-4" />
+                <span className="text-sm font-medium">Ends in:</span>
+                <div className="bg-white/20 px-3 py-1 rounded-lg font-mono font-bold text-yellow-300">
+                  {formatTime(timeLeft)}
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowSpecialOffer(false)}
+                className="text-white/80 hover:text-white text-xl"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* First Time Deposit Offer */}
+      {isFirstTimeDeposit && showWallet && (
+        <div className="bg-gradient-to-r from-green-600 to-emerald-500 text-white py-4 px-4 border-b">
+          <div className="max-w-7xl mx-auto text-center">
+            <div className="flex items-center justify-center space-x-2 mb-2">
+              <Gift className="w-6 h-6 text-yellow-300" />
+              <span className="text-xl font-bold">🎉 FIRST DEPOSIT BONUS!</span>
+              <Gift className="w-6 h-6 text-yellow-300" />
+            </div>
+            <p className="text-lg font-semibold mb-2">
+              Deposit $5 and get an extra $2 bonus instantly!
+            </p>
+            <p className="text-sm text-green-100">
+              Limited time offer • Only for new users • 40% bonus on your first deposit!
+            </p>
+          </div>
+        </div>
+      )}
+
       {!showOrders && !showWallet ? (
         <>
           {/* Hero Section */}
@@ -591,9 +675,24 @@ export default function Home() {
                               <div className="mb-4">
                                 <div className="flex items-center justify-between mb-2">
                                   <span className="text-sm text-gray-600">Rate per 1000:</span>
-                                  <span className={`font-semibold ${service.rate === 'N/A' ? 'text-red-500' : 'text-blue-600'}`}>
-                                    {service.rate === 'N/A' ? 'N/A' : `$${service.rate}`}
-                                  </span>
+                                  {service.rate === 'N/A' ? (
+                                    <span className="font-semibold text-red-500">N/A</span>
+                                  ) : (
+                                    <div className="flex items-center space-x-2">
+                                      {/* Original Price (Crossed Out) */}
+                                      <span className="text-sm text-gray-400 line-through">
+                                        ${(parseFloat(service.rate) * 3).toFixed(2)}
+                                      </span>
+                                      {/* Current Price */}
+                                      <span className="font-bold text-green-600 text-lg">
+                                        ${service.rate}
+                                      </span>
+                                      {/* Discount Badge */}
+                                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse">
+                                        66% OFF
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
                                 <div className="text-xs text-gray-500">High-quality, real-looking engagement</div>
                               </div>
@@ -926,7 +1025,64 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            {/* Deposit Section */}
+            {/* Special First-Time Deposit Offer */}
+            {isFirstTimeDeposit && (
+              <Card className="mb-8 border-2 border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 relative overflow-hidden">
+                <div className="absolute top-0 right-0 bg-red-500 text-white px-4 py-1 text-sm font-bold transform rotate-12 translate-x-4 -translate-y-1">
+                  🔥 HOT DEAL
+                </div>
+                <CardHeader className="relative">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <Gift className="w-8 h-8 text-green-600 animate-bounce" />
+                    <CardTitle className="text-2xl text-green-700">🎉 FIRST DEPOSIT BONUS!</CardTitle>
+                  </div>
+                  <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded">
+                    <div className="flex items-center">
+                      <TrendingUp className="w-6 h-6 text-yellow-600 mr-3" />
+                      <div>
+                        <p className="text-lg font-bold text-yellow-800">Deposit just $5 and get $7 total!</p>
+                        <p className="text-sm text-yellow-700">That's a 40% instant bonus on your first deposit!</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4 mt-3 text-sm">
+                    <div className="flex items-center space-x-1 text-green-600">
+                      <Clock className="w-4 h-4" />
+                      <span className="font-semibold">Expires in: {formatTime(timeLeft)}</span>
+                    </div>
+                    <div className="flex items-center space-x-1 text-orange-600">
+                      <Zap className="w-4 h-4" />
+                      <span className="font-semibold">Limited time only!</span>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="bg-white p-4 rounded-lg border-2 border-dashed border-green-300">
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-gray-800 mb-2">Special Bonus Calculation:</p>
+                      <div className="flex items-center justify-center space-x-4 text-lg">
+                        <span className="text-blue-600 font-semibold">$5.00 deposit</span>
+                        <span className="text-2xl">+</span>
+                        <span className="text-green-600 font-bold">$2.00 bonus</span>
+                        <span className="text-2xl">=</span>
+                        <span className="text-purple-600 font-bold text-xl">$7.00 total!</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Button 
+                    className="w-full bg-green-600 hover:bg-green-700 text-white py-4 text-lg font-bold animate-pulse"
+                    onClick={() => {
+                      setDepositAmount(5);
+                      setIsFirstTimeDeposit(false);
+                    }}
+                  >
+                    🎁 CLAIM MY $2 BONUS NOW! 🎁
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Regular Deposit Section */}
             <Card className="mb-8">
               <CardHeader>
                 <CardTitle className="text-xl">Add Funds to Wallet</CardTitle>
@@ -936,15 +1092,18 @@ export default function Home() {
                 {/* Deposit Amount Selection */}
                 <div>
                   <Label htmlFor="deposit-amount">Select Deposit Amount</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
-                    {[1, 10, 25, 50].map((amount) => (
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-2">
+                    {[1, 5, 10, 25, 50].map((amount) => (
                       <Button
                         key={amount}
                         variant={depositAmount === amount ? "default" : "outline"}
                         onClick={() => setDepositAmount(amount)}
-                        className="h-12"
+                        className={`h-12 ${amount === 5 && isFirstTimeDeposit ? 'ring-2 ring-green-500 bg-green-100 border-green-500' : ''}`}
                       >
                         ${amount}
+                        {amount === 5 && isFirstTimeDeposit && (
+                          <span className="ml-1 text-xs bg-red-500 text-white px-1 rounded">+40%</span>
+                        )}
                       </Button>
                     ))}
                   </div>
