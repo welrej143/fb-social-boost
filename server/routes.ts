@@ -888,6 +888,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { sessionId, senderId, senderName, senderType, message } = req.body;
       
+      console.log("Creating chat message with data:", { sessionId, senderId, senderName, senderType, message });
+      
       if (!sessionId || !senderName || !senderType || !message) {
         return res.status(400).json({ error: "Missing required fields" });
       }
@@ -900,6 +902,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message,
         isRead: 0
       });
+      
+      console.log("Chat message created successfully:", chatMessage);
       
       // Update session's last message time
       await storage.updateChatSessionStatus(sessionId, 'Active');
