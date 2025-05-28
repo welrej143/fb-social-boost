@@ -600,6 +600,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Chat API routes
+  app.post('/api/chat/session', async (req, res) => {
+    try {
+      const { sessionId, userName, userEmail, userId } = req.body;
+      
+      const session = await storage.createChatSession({
+        sessionId,
+        userId: userId || null,
+        userEmail: userEmail || null,
+        userName,
+        status: "Active"
+      });
+      
+      res.json({ success: true, session });
+    } catch (error) {
+      console.error("Error creating chat session:", error);
+      res.status(500).json({ error: "Failed to create chat session" });
+    }
+  });
+
+  app.post('/api/chat/message', async (req, res) => {
+    try {
+      const { sessionId, senderId, senderName, senderType, message } = req.body;
+      
+      const chatMessage = await storage.createChatMessage({
+        sessionId,
+        senderId: senderId || null,
+        senderName,
+        senderType,
+        message,
+        isRead: 0
+      });
+      
+      res.json({ success: true, message: chatMessage });
+    } catch (error) {
+      console.error("Error sending message:", error);
+      res.status(500).json({ error: "Failed to send message" });
+    }
+  });
+
+  app.get('/api/chat/messages/:sessionId', async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const messages = await storage.getChatMessages(sessionId);
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      res.status(500).json({ error: "Failed to fetch messages" });
+    }
+  });
+
+  app.get('/api/admin/chat/sessions', async (req, res) => {
+    try {
+      const sessions = await storage.getAllChatSessions();
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching chat sessions:", error);
+      res.status(500).json({ error: "Failed to fetch chat sessions" });
+    }
+  });
+
   // Admin routes
   app.get('/api/admin/stats', async (req, res) => {
     try {

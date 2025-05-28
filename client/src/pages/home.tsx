@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import PayPalButton from "@/components/PayPalButton";
+import LiveChat from "@/components/LiveChat";
 import { 
   Facebook, 
   Users, 
@@ -1316,6 +1317,9 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Live Chat Widget */}
+      <LiveChat />
     </div>
   );
 }

@@ -277,6 +277,52 @@ export class DatabaseStorage implements IStorage {
       .where(eq(paypalClicks.userId, userId))
       .orderBy(desc(paypalClicks.clickedAt));
   }
+
+  // Chat operations
+  async createChatSession(session: InsertChatSession): Promise<ChatSession> {
+    const [newSession] = await db.insert(chatSessions).values(session).returning();
+    return newSession;
+  }
+
+  async getChatSession(sessionId: string): Promise<ChatSession | undefined> {
+    const [session] = await db.select().from(chatSessions).where(eq(chatSessions.sessionId, sessionId));
+    return session;
+  }
+
+  async getAllChatSessions(): Promise<ChatSession[]> {
+    return await db.select().from(chatSessions).orderBy(desc(chatSessions.lastMessageAt));
+  }
+
+  async updateChatSessionStatus(sessionId: string, status: string): Promise<ChatSession | undefined> {
+    const [updatedSession] = await db.update(chatSessions)
+      .set({ status, lastMessageAt: new Date() })
+      .where(eq(chatSessions.sessionId, sessionId))
+      .returning();
+    return updatedSession;
+  }
+
+  async createChatMessage(message: InsertChatMessage): Promise<ChatMessage> {
+    const [newMessage] = await db.insert(chatMessages).values(message).returning();
+    
+    // Update session's last message timestamp
+    await db.update(chatSessions)
+      .set({ lastMessageAt: new Date() })
+      .where(eq(chatSessions.sessionId, message.sessionId));
+    
+    return newMessage;
+  }
+
+  async getChatMessages(sessionId: string): Promise<ChatMessage[]> {
+    return await db.select().from(chatMessages)
+      .where(eq(chatMessages.sessionId, sessionId))
+      .orderBy(chatMessages.createdAt);
+  }
+
+  async markMessagesAsRead(sessionId: string, senderType: string): Promise<void> {
+    await db.update(chatMessages)
+      .set({ isRead: 1 })
+      .where(eq(chatMessages.sessionId, sessionId));
+  }
 }
 
 // Use in-memory storage for reliable deployment
