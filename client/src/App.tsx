@@ -22,7 +22,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/account" component={Account} />
       <Route path="/admin" component={Admin} />
-      <Route path="/admin/chat" component={AdminChat} />
+
       <Route path="/help" component={Help} />
       <Route path="/support" component={Support} />
       <Route path="/privacy" component={Privacy} />
