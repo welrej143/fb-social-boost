@@ -1095,7 +1095,10 @@ export default function Home() {
                   <Button 
                     className="w-full bg-green-600 hover:bg-green-700 text-white py-4 text-lg font-bold animate-pulse"
                     onClick={() => {
-                      setIsFirstTimeDeposit(false);
+                      // Scroll to deposit section instead of hiding the bonus
+                      document.querySelector('.grid.grid-cols-2.md\\:grid-cols-4')?.scrollIntoView({ 
+                        behavior: 'smooth' 
+                      });
                     }}
                   >
                     🎁 CLAIM MY 25% BONUS NOW! 🎁
