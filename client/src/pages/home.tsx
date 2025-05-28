@@ -91,7 +91,7 @@ export default function Home() {
   const [showWallet, setShowWallet] = useState(false);
   const [showPayPal, setShowPayPal] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
-  const [depositAmount, setDepositAmount] = useState(1);
+  const [depositAmount, setDepositAmount] = useState(5);
   const [userBalance, setUserBalance] = useState("0.00");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState(24 * 60 * 60); // 24 hours in seconds
@@ -1092,8 +1092,8 @@ export default function Home() {
                 {/* Deposit Amount Selection */}
                 <div>
                   <Label htmlFor="deposit-amount">Select Deposit Amount</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-2">
-                    {[1, 5, 10, 25, 50].map((amount) => (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
+                    {[5, 10, 25, 50].map((amount) => (
                       <Button
                         key={amount}
                         variant={depositAmount === amount ? "default" : "outline"}
