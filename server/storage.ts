@@ -302,14 +302,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createChatMessage(message: InsertChatMessage): Promise<ChatMessage> {
-    const [newMessage] = await db.insert(chatMessages).values(message).returning();
-    
-    // Update session's last message timestamp
-    await db.update(chatSessions)
-      .set({ lastMessageAt: new Date() })
-      .where(eq(chatSessions.sessionId, message.sessionId));
-    
-    return newMessage;
+    try {
+      const messageData = {
+        ...message,
+        createdAt: new Date()
+      };
+      
+      console.log("Inserting chat message:", messageData);
+      const [newMessage] = await db.insert(chatMessages).values(messageData).returning();
+      console.log("Chat message inserted successfully:", newMessage);
+      
+      // Update session's last message timestamp
+      await db.update(chatSessions)
+        .set({ lastMessageAt: new Date() })
+        .where(eq(chatSessions.sessionId, message.sessionId));
+      
+      return newMessage;
+    } catch (error) {
+      console.error("Error creating chat message in storage:", error);
+      throw error;
+    }
   }
 
   async getChatMessages(sessionId: string): Promise<ChatMessage[]> {
