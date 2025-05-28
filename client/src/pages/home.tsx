@@ -559,7 +559,7 @@ export default function Home() {
                 <Flame className="w-5 h-5 animate-bounce text-yellow-300" />
               </div>
               <span className="text-sm md:text-base font-medium">
-                Get UP TO 75% OFF on all services!
+                Get UP TO 66% OFF on all services!
               </span>
             </div>
             <div className="flex items-center space-x-4">
