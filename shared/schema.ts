@@ -73,6 +73,28 @@ export const paypalClicks = pgTable("paypal_clicks", {
   clickedAt: timestamp("clicked_at").defaultNow().notNull(),
 });
 
+export const chatSessions = pgTable("chat_sessions", {
+  id: serial("id").primaryKey(),
+  sessionId: text("session_id").notNull().unique(),
+  userId: integer("user_id"),
+  userEmail: varchar("user_email", { length: 255 }),
+  userName: varchar("user_name", { length: 255 }),
+  status: text("status").notNull().default("Active"), // Active, Closed, Resolved
+  lastMessageAt: timestamp("last_message_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const chatMessages = pgTable("chat_messages", {
+  id: serial("id").primaryKey(),
+  sessionId: text("session_id").notNull(),
+  senderId: integer("sender_id"), // null for anonymous users
+  senderName: varchar("sender_name", { length: 255 }).notNull(),
+  senderType: text("sender_type").notNull(), // 'user' or 'admin'
+  message: text("message").notNull(),
+  isRead: integer("is_read").notNull().default(0), // 0 = unread, 1 = read
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   password: true,
@@ -112,6 +134,17 @@ export const insertPaypalClickSchema = createInsertSchema(paypalClicks).omit({
   clickedAt: true,
 });
 
+export const insertChatSessionSchema = createInsertSchema(chatSessions).omit({
+  id: true,
+  createdAt: true,
+  lastMessageAt: true,
+});
+
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type LoginUser = z.infer<typeof loginSchema>;
 export type User = typeof users.$inferSelect;
@@ -130,3 +163,9 @@ export type Ticket = typeof tickets.$inferSelect;
 
 export type InsertPaypalClick = z.infer<typeof insertPaypalClickSchema>;
 export type PaypalClick = typeof paypalClicks.$inferSelect;
+
+export type InsertChatSession = z.infer<typeof insertChatSessionSchema>;
+export type ChatSession = typeof chatSessions.$inferSelect;
+
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+export type ChatMessage = typeof chatMessages.$inferSelect;

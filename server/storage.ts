@@ -5,6 +5,8 @@ import {
   deposits, 
   tickets,
   paypalClicks,
+  chatSessions,
+  chatMessages,
   type User, 
   type Service, 
   type InsertService, 
@@ -15,7 +17,11 @@ import {
   type Ticket,
   type InsertTicket,
   type PaypalClick,
-  type InsertPaypalClick
+  type InsertPaypalClick,
+  type ChatSession,
+  type InsertChatSession,
+  type ChatMessage,
+  type InsertChatMessage
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
@@ -54,6 +60,16 @@ export interface IStorage {
   createPaypalClick(click: InsertPaypalClick): Promise<PaypalClick>;
   getAllPaypalClicks(): Promise<PaypalClick[]>;
   getPaypalClicksByUser(userId: number): Promise<PaypalClick[]>;
+  
+  // Chat operations
+  createChatSession(session: InsertChatSession): Promise<ChatSession>;
+  getChatSession(sessionId: string): Promise<ChatSession | undefined>;
+  getAllChatSessions(): Promise<ChatSession[]>;
+  updateChatSessionStatus(sessionId: string, status: string): Promise<ChatSession | undefined>;
+  
+  createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
+  getChatMessages(sessionId: string): Promise<ChatMessage[]>;
+  markMessagesAsRead(sessionId: string, senderType: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
