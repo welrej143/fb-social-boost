@@ -87,19 +87,35 @@ export default function LiveChat() {
   // Start chat session mutation
   const startChatMutation = useMutation({
     mutationFn: async (data: { name: string; email: string }) => {
-      const response = await fetch("/api/chat/session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          sessionId,
-          userName: data.name,
-          userEmail: data.email,
-          userId: user?.id || null,
-        }),
-      });
-      if (!response.ok) throw new Error("Failed to start chat");
-      return response.json();
+      console.log("Starting chat with data:", data);
+      try {
+        const response = await fetch("/api/chat/session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            sessionId,
+            userName: data.name,
+            userEmail: data.email,
+            userId: user?.id || null,
+          }),
+        });
+        
+        console.log("Chat session response:", response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Chat session error:", errorText);
+          throw new Error(`Failed to start chat: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log("Chat session created:", result);
+        return result;
+      } catch (error) {
+        console.error("Chat mutation error:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       setHasStartedChat(true);
@@ -108,7 +124,8 @@ export default function LiveChat() {
         description: "You're now connected to our support team!",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Chat start failed:", error);
       toast({
         title: "Connection Failed",
         description: "Unable to start chat. Please try again.",
