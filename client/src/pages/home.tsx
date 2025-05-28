@@ -1318,8 +1318,7 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Live Chat Widget */}
-      <LiveChat />
+
     </div>
   );
 }
