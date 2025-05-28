@@ -1040,8 +1040,8 @@ export default function Home() {
                     <div className="flex items-center">
                       <TrendingUp className="w-6 h-6 text-yellow-600 mr-3" />
                       <div>
-                        <p className="text-lg font-bold text-yellow-800">Deposit just $5 and get $7 total!</p>
-                        <p className="text-sm text-yellow-700">That's a 40% instant bonus on your first deposit!</p>
+                        <p className="text-lg font-bold text-yellow-800">Get 25% BONUS on your first deposit!</p>
+                        <p className="text-sm text-yellow-700">Deposit any amount and get an instant 25% bonus added to your wallet!</p>
                       </div>
                     </div>
                   </div>
@@ -1059,24 +1059,46 @@ export default function Home() {
                 <CardContent className="space-y-4">
                   <div className="bg-white p-4 rounded-lg border-2 border-dashed border-green-300">
                     <div className="text-center">
-                      <p className="text-lg font-bold text-gray-800 mb-2">Special Bonus Calculation:</p>
-                      <div className="flex items-center justify-center space-x-4 text-lg">
-                        <span className="text-blue-600 font-semibold">$5.00 deposit</span>
-                        <span className="text-2xl">+</span>
-                        <span className="text-green-600 font-bold">$2.00 bonus</span>
-                        <span className="text-2xl">=</span>
-                        <span className="text-purple-600 font-bold text-xl">$7.00 total!</span>
+                      <p className="text-lg font-bold text-gray-800 mb-2">Bonus Examples:</p>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center justify-center space-x-2">
+                          <span className="text-blue-600 font-semibold">$5</span>
+                          <span>+</span>
+                          <span className="text-green-600 font-bold">$1.25</span>
+                          <span>=</span>
+                          <span className="text-purple-600 font-bold">$6.25</span>
+                        </div>
+                        <div className="flex items-center justify-center space-x-2">
+                          <span className="text-blue-600 font-semibold">$10</span>
+                          <span>+</span>
+                          <span className="text-green-600 font-bold">$2.50</span>
+                          <span>=</span>
+                          <span className="text-purple-600 font-bold">$12.50</span>
+                        </div>
+                        <div className="flex items-center justify-center space-x-2">
+                          <span className="text-blue-600 font-semibold">$25</span>
+                          <span>+</span>
+                          <span className="text-green-600 font-bold">$6.25</span>
+                          <span>=</span>
+                          <span className="text-purple-600 font-bold">$31.25</span>
+                        </div>
+                        <div className="flex items-center justify-center space-x-2">
+                          <span className="text-blue-600 font-semibold">$50</span>
+                          <span>+</span>
+                          <span className="text-green-600 font-bold">$12.50</span>
+                          <span>=</span>
+                          <span className="text-purple-600 font-bold">$62.50</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                   <Button 
                     className="w-full bg-green-600 hover:bg-green-700 text-white py-4 text-lg font-bold animate-pulse"
                     onClick={() => {
-                      setDepositAmount(5);
                       setIsFirstTimeDeposit(false);
                     }}
                   >
-                    🎁 CLAIM MY $2 BONUS NOW! 🎁
+                    🎁 CLAIM MY 25% BONUS NOW! 🎁
                   </Button>
                 </CardContent>
               </Card>
@@ -1098,11 +1120,13 @@ export default function Home() {
                         key={amount}
                         variant={depositAmount === amount ? "default" : "outline"}
                         onClick={() => setDepositAmount(amount)}
-                        className={`h-12 ${amount === 5 && isFirstTimeDeposit ? 'ring-2 ring-green-500 bg-green-100 border-green-500' : ''}`}
+                        className={`h-12 flex flex-col justify-center ${isFirstTimeDeposit ? 'ring-2 ring-green-500 bg-green-100 border-green-500' : ''}`}
                       >
-                        ${amount}
-                        {amount === 5 && isFirstTimeDeposit && (
-                          <span className="ml-1 text-xs bg-red-500 text-white px-1 rounded">+40%</span>
+                        <span>${amount}</span>
+                        {isFirstTimeDeposit && (
+                          <span className="text-xs bg-red-500 text-white px-1 rounded mt-1">
+                            +${(amount * 0.25).toFixed(2)}
+                          </span>
                         )}
                       </Button>
                     ))}
