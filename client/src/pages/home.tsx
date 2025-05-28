@@ -86,7 +86,7 @@ export default function Home() {
   const [showWallet, setShowWallet] = useState(false);
   const [showPayPal, setShowPayPal] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
-  const [depositAmount, setDepositAmount] = useState(10);
+  const [depositAmount, setDepositAmount] = useState(1);
   const [userBalance, setUserBalance] = useState("0.00");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
@@ -937,7 +937,7 @@ export default function Home() {
                 <div>
                   <Label htmlFor="deposit-amount">Select Deposit Amount</Label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
-                    {[10, 25, 50, 100].map((amount) => (
+                    {[1, 10, 25, 50].map((amount) => (
                       <Button
                         key={amount}
                         variant={depositAmount === amount ? "default" : "outline"}
@@ -953,10 +953,10 @@ export default function Home() {
                     <Input
                       id="custom-amount"
                       type="number"
-                      min="10"
+                      min="1"
                       max="1000"
                       value={depositAmount}
-                      onChange={(e) => setDepositAmount(Math.max(10, parseInt(e.target.value) || 10))}
+                      onChange={(e) => setDepositAmount(Math.max(1, parseInt(e.target.value) || 1))}
                       className="w-24"
                     />
                   </div>
