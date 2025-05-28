@@ -1125,7 +1125,7 @@ export default function Home() {
                         onClick={() => setDepositAmount(amount)}
                         className={`h-12 flex flex-col justify-center ${isFirstTimeDeposit ? 'ring-2 ring-green-500 bg-green-100 border-green-500' : ''}`}
                       >
-                        <span>${amount}</span>
+                        <span className={depositAmount === amount ? "text-white" : ""}>${amount}</span>
                         {isFirstTimeDeposit && (
                           <span className="text-xs bg-red-500 text-white px-1 rounded mt-1">
                             +${(amount * 0.25).toFixed(2)}
