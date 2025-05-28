@@ -109,8 +109,15 @@ export default function LiveChat() {
           throw new Error(`Failed to start chat: ${response.status}`);
         }
         
-        const result = await response.json();
-        console.log("Chat session created:", result);
+        let result;
+        try {
+          result = await response.json();
+          console.log("Chat session created:", result);
+        } catch (parseError) {
+          console.warn("Response was not JSON, treating as success");
+          // If we get a 200 but can't parse JSON, consider it successful
+          result = { success: true };
+        }
         return result;
       } catch (error) {
         console.error("Chat mutation error:", error);
