@@ -969,12 +969,12 @@ export default function Home() {
                     <p className="text-sm text-gray-600 mb-4">
                       Secure payment processing through PayPal. Funds will be added to your wallet instantly.
                     </p>
-                    <PayPalButton
-                      key={depositAmount}
-                      amount={depositAmount.toString()}
-                      currency="USD"
-                      intent="CAPTURE"
-                      onSuccess={(data) => {
+                    <div key={depositAmount}>
+                      <PayPalButton
+                        amount={depositAmount.toString()}
+                        currency="USD"
+                        intent="CAPTURE"
+                        onSuccess={(data) => {
                         setUserBalance(data.newBalance);
                         toast({
                           title: "Deposit Successful",
@@ -990,6 +990,7 @@ export default function Home() {
                         });
                       }}
                     />
+                    </div>
                   </div>
                 </div>
 
