@@ -1121,11 +1121,17 @@ export default function Home() {
                     {[5, 10, 25, 50].map((amount) => (
                       <Button
                         key={amount}
-                        variant={depositAmount === amount ? "default" : "outline"}
+                        variant="outline"
                         onClick={() => setDepositAmount(amount)}
-                        className={`h-12 flex flex-col justify-center ${isFirstTimeDeposit ? 'ring-2 ring-green-500 bg-green-100 border-green-500' : ''}`}
+                        className={`h-12 flex flex-col justify-center ${
+                          depositAmount === amount 
+                            ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' 
+                            : isFirstTimeDeposit 
+                              ? 'ring-2 ring-green-500 bg-green-100 border-green-500' 
+                              : ''
+                        }`}
                       >
-                        <span className={depositAmount === amount ? "text-gray-800 font-semibold" : ""}>${amount}</span>
+                        <span className={depositAmount === amount ? "text-white font-semibold" : ""}>${amount}</span>
                         {isFirstTimeDeposit && (
                           <span className="text-xs bg-red-500 text-white px-1 rounded mt-1">
                             +${(amount * 0.25).toFixed(2)}
