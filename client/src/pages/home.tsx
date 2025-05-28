@@ -591,10 +591,10 @@ export default function Home() {
               <Gift className="w-6 h-6 text-yellow-300" />
             </div>
             <p className="text-lg font-semibold mb-2">
-              Deposit $5 and get an extra $2 bonus instantly!
+              Get 25% bonus on your very first deposit!
             </p>
             <p className="text-sm text-green-100">
-              Limited time offer • Only for new users • 40% bonus on your first deposit!
+              Limited time offer • One-time bonus for new users only • Available once per account!
             </p>
           </div>
         </div>
@@ -1029,7 +1029,7 @@ export default function Home() {
             {isFirstTimeDeposit && (
               <Card className="mb-8 border-2 border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 relative overflow-hidden">
                 <div className="absolute top-0 right-0 bg-red-500 text-white px-4 py-1 text-sm font-bold transform rotate-12 translate-x-4 -translate-y-1">
-                  🔥 HOT DEAL
+                  🔥 ONE-TIME ONLY
                 </div>
                 <CardHeader className="relative">
                   <div className="flex items-center space-x-3 mb-2">
@@ -1158,11 +1158,25 @@ export default function Home() {
                         currency="USD"
                         intent="CAPTURE"
                         onSuccess={(data) => {
+                        const actualDeposit = parseFloat(data.depositAmount);
+                        const bonusAmount = isFirstTimeDeposit ? actualDeposit * 0.25 : 0;
+                        const totalAmount = actualDeposit + bonusAmount;
+                        
                         setUserBalance(data.newBalance);
-                        toast({
-                          title: "Deposit Successful",
-                          description: `$${data.depositAmount} has been added to your wallet. New balance: $${data.newBalance}`,
-                        });
+                        
+                        if (isFirstTimeDeposit) {
+                          setIsFirstTimeDeposit(false); // Mark as no longer first-time
+                          toast({
+                            title: "🎉 First Deposit Bonus Applied!",
+                            description: `$${actualDeposit} deposit + $${bonusAmount.toFixed(2)} bonus = $${totalAmount.toFixed(2)} total added! New balance: $${data.newBalance}`,
+                          });
+                        } else {
+                          toast({
+                            title: "Deposit Successful",
+                            description: `$${data.depositAmount} has been added to your wallet. New balance: $${data.newBalance}`,
+                          });
+                        }
+                        
                         queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
                       }}
                       onError={(error) => {
