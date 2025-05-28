@@ -79,7 +79,7 @@ export default function LiveChat() {
 
   // Fetch messages for current session
   const { data: messages = [], refetch: refetchMessages } = useQuery<ChatMessage[]>({
-    queryKey: ["/api/chat/messages", sessionId],
+    queryKey: [`/api/chat/messages/${sessionId}`],
     enabled: !!sessionId && hasStartedChat,
     refetchInterval: 2000, // Poll every 2 seconds for new messages
   });
