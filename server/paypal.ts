@@ -17,9 +17,14 @@ import { Request, Response } from "express";
 
 /* PayPal Controllers Setup */
 
-// Using sandbox credentials for testing
-const PAYPAL_CLIENT_ID = "AU56b7rwoblo-SDSfUG1EdHWbq8KpkWfJsWXhD9JkmN3k6u2QvLIZdMYALmHN_Or60lE4rodM7L4Jd0N";
-const PAYPAL_CLIENT_SECRET = "EEvzU1y_RPe91BqEaenP5XQ5sUq_PKPO1RyFsB49FZHDSsRdJ6WK12dqvo5254QFYH5P-5NSqx7Pofqn";
+const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
+
+if (!PAYPAL_CLIENT_ID) {
+  throw new Error("Missing PAYPAL_CLIENT_ID");
+}
+if (!PAYPAL_CLIENT_SECRET) {
+  throw new Error("Missing PAYPAL_CLIENT_SECRET");
+}
 
 const client = new Client({
   clientCredentialsAuthCredentials: {
