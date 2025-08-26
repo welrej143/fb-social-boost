@@ -15,15 +15,12 @@ import {
 import { useToast } from "@/hooks/use-toast";
 
 interface GCashPaymentProps {
-  amountUSD: string;
+  amountPHP: string;
   onCancel: () => void;
 }
 
-export default function GCashPayment({ amountUSD, onCancel }: GCashPaymentProps) {
+export default function GCashPayment({ amountPHP, onCancel }: GCashPaymentProps) {
   const { toast } = useToast();
-  
-  // Convert USD to PHP at fixed rate of 1 USD = 60 PHP
-  const amountPHP = (parseFloat(amountUSD) * 60).toFixed(2);
   
   const gcashName = "JE***L N.";
   const gcashNumber = "09678361036";
@@ -38,7 +35,7 @@ export default function GCashPayment({ amountUSD, onCancel }: GCashPaymentProps)
   };
   
   const openWhatsApp = () => {
-    const message = `Hi! I want to deposit ₱${amountPHP} to my account via GCash. Please confirm the payment details.`;
+    const message = `Hi! I want to deposit ₱${parseFloat(amountPHP).toFixed(0)} to my account via GCash. Please confirm the payment details.`;
     const whatsappUrl = `https://wa.me/${whatsappNumber.replace('+', '')}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -52,15 +49,15 @@ export default function GCashPayment({ amountUSD, onCancel }: GCashPaymentProps)
             GCash Payment
           </CardTitle>
           <div className="text-2xl font-bold text-green-600">
-            ₱{amountPHP}
+            ₱{parseFloat(amountPHP).toFixed(0)}
           </div>
         </CardHeader>
         
         <CardContent className="space-y-4">
-          {/* Exchange Rate Info */}
+          {/* Amount Info */}
           <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
             <div className="text-sm text-blue-700 font-medium">
-              Current Exchange Rate: 1 USD = 60 PHP
+              Deposit Amount: ₱{parseFloat(amountPHP).toFixed(0)}
             </div>
           </div>
           

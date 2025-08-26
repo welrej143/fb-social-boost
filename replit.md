@@ -21,7 +21,7 @@ Preferred communication style: Simple, everyday language.
   - 5000+ items: 20% discount
   - 10000+ items: 30% discount  
   - 20000+ items: 70% discount
-- **Minimum Deposit**: Set to $5 (₱300 PHP) 
+- **Minimum Deposit**: Set to ₱300 PHP 
 - **Login Persistence**: Extended session to 30 days with rolling refresh
 - **Timer Persistence**: Flash sale countdown now persists across page refreshes using localStorage
 

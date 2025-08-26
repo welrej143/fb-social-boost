@@ -92,7 +92,7 @@ export default function Home() {
   const [showWallet, setShowWallet] = useState(false);
   const [showGCash, setShowGCash] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
-  const [depositAmount, setDepositAmount] = useState(300); // Starting with ₱300 (equivalent to $5)
+  const [depositAmount, setDepositAmount] = useState(300); // Starting with ₱300
   const [userBalance, setUserBalance] = useState("0.00");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState(() => {
@@ -1197,7 +1197,7 @@ export default function Home() {
                     </div>
                   ) : (
                     <GCashPayment 
-                      amountUSD={(depositAmount / 60).toFixed(2)}
+                      amountPHP={depositAmount.toString()}
                       onCancel={() => setShowGCash(false)}
                     />
                   )}
