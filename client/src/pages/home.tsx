@@ -1119,7 +1119,7 @@ export default function Home() {
                 <div>
                   <Label htmlFor="deposit-amount">Select Deposit Amount</Label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
-                    {[5, 10, 25, 50].map((amount) => (
+                    {[1, 5, 10, 25].map((amount) => (
                       <Button
                         key={amount}
                         variant="outline"
@@ -1146,10 +1146,10 @@ export default function Home() {
                     <Input
                       id="custom-amount"
                       type="number"
-                      min="5"
+                      min="1"
                       max="1000"
                       value={depositAmount}
-                      onChange={(e) => setDepositAmount(Math.max(5, parseInt(e.target.value) || 5))}
+                      onChange={(e) => setDepositAmount(Math.max(1, parseInt(e.target.value) || 1))}
                       className="w-24"
                     />
                   </div>
