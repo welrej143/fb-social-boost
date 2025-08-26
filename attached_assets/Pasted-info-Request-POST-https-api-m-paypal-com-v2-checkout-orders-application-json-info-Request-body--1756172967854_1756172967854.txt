@@ -1,0 +1,59 @@
+info: Request POST https://api-m.paypal.com/v2/checkout/orders application/json
+info: Request body {"type":"text","content":"{\"intent\":\"CAPTURE\",\"purchase_units\":[{\"amount\":{\"currency_code\":\"USD\",\"value\":\"1\"}}]}"}
+1:48:38 AM [express] POST /api/paypal/track-click 200 in 226ms :: {"success":true}
+info: Response 201 469 application/json
+info: Response headers {"connection":"keep-alive","content-length":"469","content-type":"application/json","access-control-expose-headers":"**Redacted**","server-timing":"**Redacted**","cache-control":"max-age=0, no-cache, no-store, must-revalidate","paypal-debug-id":"**Redacted**","set-cookie":"**Redacted**","accept-ranges":"**Redacted**","via":"1.1 varnish, 1.1 varnish","edge-control":"**Redacted**","date":"Tue, 26 Aug 2025 01:48:39 GMT","strict-transport-security":"**Redacted**","x-served-by":"**Redacted**","x-cache":"**Redacted**","x-cache-hits":"**Redacted**","x-timer":"**Redacted**","vary":"Accept-Encoding"}
+info: Request POST https://api-m.paypal.com/v2/checkout/orders/45K67718BR7053631/capture application/json
+info: Request body undefined
+info: Response 422 589 application/json
+info: Response headers {"date":"Tue, 26 Aug 2025 01:48:59 GMT","content-type":"application/json","content-length":"589","connection":"keep-alive","cf-ray":"**Redacted**","access-control-expose-headers":"**Redacted**","application_id":"**Redacted**","border-ip":"**Redacted**","cache-control":"max-age=0, no-cache, no-store, must-revalidate","caller_acct_num":"**Redacted**","paypal-debug-id":"**Redacted**","processing-ip":"**Redacted**","server-timing":"**Redacted**","set-cookie":"**Redacted**","vary":"Accept-Encoding","cf-cache-status":"**Redacted**","strict-transport-security":"**Redacted**","server":"cloudflare"}
+Failed to create order: CustomError
+    at CustomError.ApiError [as constructor] (/opt/render/project/src/node_modules/@apimatic/core/lib/errors/apiError.js:16:28)
+    at new CustomError (/opt/render/project/src/node_modules/@paypal/paypal-server-sdk/dist/cjs/errors/customError.js:14:42)
+    at /opt/render/project/src/node_modules/@apimatic/core/lib/http/requestBuilder.js:457:31
+    at DefaultRequestBuilder.<anonymous> (/opt/render/project/src/node_modules/@apimatic/core/lib/http/requestBuilder.js:186:50)
+    at step (/opt/render/project/src/node_modules/tslib/tslib.js:196:27)
+    at Object.next (/opt/render/project/src/node_modules/tslib/tslib.js:177:57)
+    at fulfilled (/opt/render/project/src/node_modules/tslib/tslib.js:167:62)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+  request: {
+    method: 'POST',
+    url: 'https://api-m.paypal.com/v2/checkout/orders/45K67718BR7053631/capture',
+    headers: {
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
+      authorization: 'Bearer A21AANE7vCvnNph7aisBLkjJ9NlMudqWWnE6DTloBoMdO29HfKbyzGP0U9wQXsilYdr7mX9d79RTyS_gdtnkcgWjbnAwtaohw',
+      'user-agent': 'PayPal REST API TypeScript SDK, Version: 1.0.0, on OS {os-info}',
+      accept: 'application/json'
+    }
+  },
+  statusCode: 422,
+  headers: {
+    date: 'Tue, 26 Aug 2025 01:48:59 GMT',
+    'content-type': 'application/json',
+    'content-length': '589',
+    connection: 'keep-alive',
+    'cf-ray': '974fab831f4cfddf-SIN',
+    'access-control-expose-headers': 'Server-Timing',
+    application_id: 'APP-0XS64041K64322730',
+    'border-ip': '10.85.26.5',
+    'cache-control': 'max-age=0, no-cache, no-store, must-revalidate',
+    caller_acct_num: '5WFCLC62LA5XG',
+    'paypal-debug-id': '44aa262ba662e',
+    'processing-ip': '10.166.2.111',
+    'server-timing': 'traceparent;desc="00-000000000000000000044aa262ba662e-f5f27569e5c4eed9-01"',
+    'set-cookie': 'l7_az=ccg01.phx; Path=/; Domain=paypal.com; Expires=Tue, 26 Aug 2025 02:18:59 GMT; HttpOnly; Secure,__cf_bm=P7jFL22FwRVn8GLhyrpptnIKYLL6DwODOYJnRqe0LeE-1756172939-1.0.1.1-zaSq9fWuw8XFQ9KndDxEbrvUjJG.vivnO6A_jDzq85vawrKtGxiwqBLbCFLvM2x9njbTO9qIuEAt8rR_uN4Sl4lH7PHwI5FUk6AuCkDHG8I; path=/; expires=Tue, 26-Aug-25 02:18:59 GMT; domain=.api-m.paypal.com; HttpOnly; Secure; SameSite=None',
+    vary: 'Accept-Encoding',
+    'cf-cache-status': 'DYNAMIC',
+    'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+    server: 'cloudflare'
+  },
+  body: `{"name":"UNPROCESSABLE_ENTITY","details":[{"issue":"INSTRUMENT_DECLINED","description":"The instrument presented  was either declined by the processor or bank, or it can't be used for this payment."}],"message":"The requested action could not be performed, semantically incorrect, or failed business validation.","debug_id":"44aa262ba662e","links":[{"href":"https://developer.paypal.com/api/rest/reference/orders/v2/errors/#INSTRUMENT_DECLINED","rel":"information_link","method":"GET"},{"href":"https://www.paypal.com/checkoutnow?token=45K67718BR7053631","rel":"redirect","method":"GET"}]}`,
+  result: [Object: null prototype] {
+    name: 'UNPROCESSABLE_ENTITY',
+    details: [ [Object: null prototype] ],
+    message: 'The requested action could not be performed, semantically incorrect, or failed business validation.',
+    debug_id: '44aa262ba662e',
+    links: [ [Object: null prototype], [Object: null prototype] ]
+  }
+}
