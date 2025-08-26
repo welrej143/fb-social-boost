@@ -4,7 +4,8 @@ import { json } from "express";
 import { storage } from "./storage";
 import { getSession, isAuthenticated, hashPassword, comparePassword } from "./auth";
 import { insertOrderSchema, insertDepositSchema, insertUserSchema, loginSchema, insertTicketSchema } from "@shared/schema";
-import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
+// PayPal integration removed - using manual GCash processing
+// import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 
 const SMM_API_BASE = process.env.SMM_API_URL || "https://smmvaly.com/api/v2";
 const SMM_API_KEY = process.env.SMM_API_KEY || "55265fdd0afb3d0a3e9df2b241b266c3";
@@ -134,18 +135,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // PayPal routes
-  app.get("/paypal/setup", async (req, res) => {
-    await loadPaypalDefault(req, res);
-  });
+  // PayPal routes removed - using manual GCash processing
+  // app.get("/paypal/setup", async (req, res) => {
+  //   await loadPaypalDefault(req, res);
+  // });
 
-  app.post("/paypal/order", async (req, res) => {
-    await createPaypalOrder(req, res);
-  });
+  // app.post("/paypal/order", async (req, res) => {
+  //   await createPaypalOrder(req, res);
+  // });
 
-  app.post("/paypal/order/:orderID/capture", async (req, res) => {
-    await capturePaypalOrder(req, res);
-  });
+  // app.post("/paypal/order/:orderID/capture", async (req, res) => {
+  //   await capturePaypalOrder(req, res);
+  // });
 
   // Get all services - fetch from SMM API and save to database, then serve from database
   app.get("/api/services", async (req, res) => {
@@ -524,81 +525,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Track PayPal button clicks
-  app.post("/api/paypal/track-click", async (req: any, res) => {
-    try {
-      const { depositAmount } = req.body;
-      const userId = req.session?.userId;
-      const userEmail = req.session?.userEmail;
-      
-      // Track the click even if user is not logged in
-      await storage.createPaypalClick({
-        userId: userId || null,
-        userEmail: userEmail || null,
-        depositAmount: depositAmount || "0",
-        sessionId: req.sessionID || null,
-        ipAddress: req.ip || req.connection?.remoteAddress || null,
-        userAgent: req.get('User-Agent') || null
-      });
+  // PayPal routes removed - using manual GCash processing
+  // Track PayPal button clicks - removed
+  // app.post("/api/paypal/track-click", async (req: any, res) => {
+  //   // PayPal click tracking removed
+  // });
 
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Error tracking PayPal click:", error);
-      res.status(500).json({ error: "Failed to track click" });
-    }
-  });
-
-  // Process PayPal wallet deposit
-  app.post("/api/wallet/deposit", async (req: any, res) => {
-    try {
-      const { amount, paypalOrderId } = req.body;
-      const userId = req.session?.userId;
-
-      if (!userId) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      if (!amount || !paypalOrderId) {
-        return res.status(400).json({ error: "Amount and PayPal order ID required" });
-      }
-
-      const depositAmount = parseFloat(amount);
-      if (depositAmount <= 0) {
-        return res.status(400).json({ error: "Invalid deposit amount" });
-      }
-
-      // Get current user balance
-      const user = await storage.getUser(userId);
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      // Calculate new balance
-      const currentBalance = parseFloat(user.balance);
-      const newBalance = (currentBalance + depositAmount).toFixed(2);
-
-      // Update user balance
-      const updatedUser = await storage.updateUserBalance(userId, newBalance);
-      
-      // Create deposit record
-      await storage.createDeposit({
-        userId,
-        amount: depositAmount.toFixed(2),
-        status: "Completed",
-        paypalOrderId
-      });
-
-      res.json({ 
-        success: true, 
-        newBalance,
-        depositAmount: depositAmount.toFixed(2),
-        message: "Deposit completed successfully"
-      });
-    } catch (error) {
-      console.error("Error processing deposit:", error);
-      res.status(500).json({ error: "Failed to process deposit" });
-    }
-  });
+  // Process PayPal wallet deposit - removed  
+  // app.post("/api/wallet/deposit", async (req: any, res) => {
+  //   // PayPal deposit processing removed - using manual GCash processing
+  // });
 
   // Chat API routes
   app.post('/api/chat/session', async (req, res) => {
@@ -939,16 +875,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin endpoint to get PayPal click analytics
-  app.get("/api/admin/paypal-clicks", async (req: any, res) => {
-    try {
-      const clicks = await storage.getAllPaypalClicks();
-      res.json(clicks);
-    } catch (error) {
-      console.error("Error fetching PayPal clicks:", error);
-      res.status(500).json({ error: "Failed to fetch PayPal clicks" });
-    }
-  });
+  // Admin endpoint removed - PayPal analytics no longer needed
+  // app.get("/api/admin/paypal-clicks", async (req: any, res) => {
+  //   // PayPal click analytics removed
+  // });
 
   const httpServer = createServer(app);
   return httpServer;

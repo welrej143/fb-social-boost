@@ -6,6 +6,22 @@ This is a Facebook social media boost service platform that allows users to purc
 
 Preferred communication style: Simple, everyday language.
 
+# Recent Changes (January 2025)
+
+## Payment System Migration (January 26, 2025)
+- **Removed PayPal Integration**: Completely removed PayPal payment system to focus on Philippines market
+- **Implemented GCash Manual Processing**: Added GCash payment system with manual processing via WhatsApp
+- **Currency Conversion**: Fixed rate of 1 USD = 60 PHP for all transactions
+- **Contact Information**: 
+  - GCash: JE***L A. (09678361036)
+  - WhatsApp: +639678361036 for payment confirmations
+- **Processing Time**: Manual processing within 2-24 hours
+- **Discount Update**: Changed maximum discount from 66% to 50%
+  - 5000+ items: 20% discount
+  - 10000+ items: 30% discount  
+  - 20000+ items: 50% discount
+- **Minimum Deposit**: Reduced from $5 to $1 for testing
+
 # System Architecture
 
 ## Frontend Architecture

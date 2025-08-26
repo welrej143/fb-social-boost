@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
-import PayPalButton from "@/components/PayPalButton";
+import GCashPayment from "@/components/GCashPayment";
 import LiveChat from "@/components/LiveChat";
 import { 
   Facebook, 
@@ -90,9 +90,9 @@ export default function Home() {
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
   const [showWallet, setShowWallet] = useState(false);
-  const [showPayPal, setShowPayPal] = useState(false);
+  const [showGCash, setShowGCash] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
-  const [depositAmount, setDepositAmount] = useState(5);
+  const [depositAmount, setDepositAmount] = useState(1);
   const [userBalance, setUserBalance] = useState("0.00");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState(24 * 60 * 60); // 24 hours in seconds
@@ -316,7 +316,7 @@ export default function Home() {
 
   const handleBackToServices = () => {
     setShowOrderForm(false);
-    setShowPayPal(false);
+    setShowGCash(false);
     setSelectedService(null);
     setFacebookLink("");
     setQuantity(1000);
@@ -364,9 +364,9 @@ export default function Home() {
 
   // Calculate discount based on quantity
   const getDiscount = (qty: number) => {
-    if (qty >= 20000) return 0.20; // 20% discount
-    if (qty >= 10000) return 0.15; // 15% discount
-    if (qty >= 5000) return 0.10;  // 10% discount
+    if (qty >= 20000) return 0.50; // 50% discount
+    if (qty >= 10000) return 0.30; // 30% discount
+    if (qty >= 5000) return 0.20;  // 20% discount
     return 0; // No discount for 1,000-4,000
   };
 
@@ -560,7 +560,7 @@ export default function Home() {
                 <Flame className="w-5 h-5 animate-bounce text-yellow-300" />
               </div>
               <span className="text-sm md:text-base font-medium">
-                Get UP TO 66% OFF on all services!
+                Get UP TO 50% OFF on all services!
               </span>
             </div>
             <div className="flex items-center space-x-4">
@@ -690,7 +690,7 @@ export default function Home() {
                                       </span>
                                       {/* Discount Badge */}
                                       <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse">
-                                        66% OFF
+                                        50% OFF
                                       </span>
                                     </div>
                                   )}
@@ -1155,50 +1155,27 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* PayPal Deposit Button */}
+                {/* GCash Deposit Button */}
                 <div className="space-y-4">
-                  <div className="bg-blue-50 rounded-lg p-4">
-                    <h4 className="font-semibold text-gray-900 mb-2">Deposit ${depositAmount} via PayPal</h4>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Secure payment processing through PayPal. Funds will be added to your wallet instantly.
-                    </p>
-                    <div key={depositAmount}>
-                      <PayPalButton
-                        amount={depositAmount.toString()}
-                        currency="USD"
-                        intent="CAPTURE"
-                        onSuccess={(data) => {
-                        const actualDeposit = parseFloat(data.depositAmount);
-                        const bonusAmount = isFirstTimeDeposit ? actualDeposit * 0.25 : 0;
-                        const totalAmount = actualDeposit + bonusAmount;
-                        
-                        setUserBalance(data.newBalance);
-                        
-                        if (isFirstTimeDeposit) {
-                          setIsFirstTimeDeposit(false); // Mark as no longer first-time
-                          toast({
-                            title: "🎉 First Deposit Bonus Applied!",
-                            description: `$${actualDeposit} deposit + $${bonusAmount.toFixed(2)} bonus = $${totalAmount.toFixed(2)} total added! New balance: $${data.newBalance}`,
-                          });
-                        } else {
-                          toast({
-                            title: "Deposit Successful",
-                            description: `$${data.depositAmount} has been added to your wallet. New balance: $${data.newBalance}`,
-                          });
-                        }
-                        
-                        queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-                      }}
-                      onError={(error) => {
-                        toast({
-                          title: "Deposit Failed",
-                          description: error,
-                          variant: "destructive",
-                        });
-                      }}
-                    />
+                  {!showGCash ? (
+                    <div className="bg-blue-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Deposit ${depositAmount} via GCash</h4>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Manual payment processing through GCash. Contact us on WhatsApp to complete your deposit.
+                      </p>
+                      <Button 
+                        onClick={() => setShowGCash(true)}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        Proceed with GCash Payment
+                      </Button>
                     </div>
-                  </div>
+                  ) : (
+                    <GCashPayment 
+                      amountUSD={depositAmount.toString()}
+                      onCancel={() => setShowGCash(false)}
+                    />
+                  )}
                 </div>
 
                 <Button
@@ -1241,7 +1218,7 @@ export default function Home() {
                       <div className="flex items-center justify-between mb-4">
                         <div>
                           <h4 className="font-semibold text-gray-900">
-                            Order #{order.smmOrderId || order.orderId}
+                            Order #{order.orderId}
                           </h4>
                           <p className="text-sm text-gray-500">{order.serviceName}</p>
                         </div>
