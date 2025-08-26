@@ -92,7 +92,7 @@ export default function Home() {
   const [showWallet, setShowWallet] = useState(false);
   const [showGCash, setShowGCash] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
-  const [depositAmount, setDepositAmount] = useState(5);
+  const [depositAmount, setDepositAmount] = useState(300); // Starting with ₱300 (equivalent to $5)
   const [userBalance, setUserBalance] = useState("0.00");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState(() => {
@@ -193,7 +193,7 @@ export default function Home() {
       if (data.success) {
         toast({
           title: "Order Successful!",
-          description: `Order submitted to SMM API! New balance: $${data.newBalance}. SMM Order ID: ${data.order.smmOrderId}`,
+          description: `Order submitted to SMM API! New balance: ₱${(parseFloat(data.newBalance) * 60).toFixed(0)}. SMM Order ID: ${data.order.smmOrderId}`,
         });
         // Refresh user data and orders
         queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
@@ -230,7 +230,7 @@ export default function Home() {
       if (data.success) {
         toast({
           title: "Payment Successful!",
-          description: `Order submitted to SMM API. New balance: $${data.newBalance}`,
+          description: `Order submitted to SMM API. New balance: ₱${(parseFloat(data.newBalance) * 60).toFixed(0)}`,
         });
         // Refresh user data and orders
         queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
@@ -456,7 +456,7 @@ export default function Home() {
               </button>
               {isAuthenticated && (
                 <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
-                  Balance: ${userBalance}
+                  Balance: ₱{(parseFloat(userBalance || "0") * 60).toLocaleString()}
                 </div>
               )}
               
@@ -541,7 +541,7 @@ export default function Home() {
               </button>
               {isAuthenticated && (
                 <div className="bg-green-100 text-green-700 px-3 py-2 rounded-lg text-sm font-medium">
-                  Balance: ${userBalance}
+                  Balance: ₱{(parseFloat(userBalance || "0") * 60).toLocaleString()}
                 </div>
               )}
               
@@ -707,11 +707,11 @@ export default function Home() {
                                     <div className="flex items-center space-x-2">
                                       {/* Original Price (Crossed Out) */}
                                       <span className="text-sm text-gray-400 line-through">
-                                        ${(parseFloat(service.rate) * 3).toFixed(2)}
+                                        ₱{(parseFloat(service.rate) * 3 * 60).toFixed(0)}
                                       </span>
                                       {/* Current Price */}
                                       <span className="font-bold text-green-600 text-lg">
-                                        ${service.rate}
+                                        ₱{(parseFloat(service.rate) * 60).toFixed(0)}
                                       </span>
                                       {/* Discount Badge */}
                                       <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse">
@@ -750,7 +750,7 @@ export default function Home() {
                           </div>
                           <div className="text-right">
                             <div className="text-sm text-gray-600">Rate per 1000</div>
-                            <div className="font-bold text-blue-600">${selectedService.rate}</div>
+                            <div className="font-bold text-blue-600">₱{(parseFloat(selectedService.rate) * 60).toFixed(0)}</div>
                           </div>
                         </div>
                       </div>
@@ -817,24 +817,24 @@ export default function Home() {
                             </div>
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-600">Rate per 1,000:</span>
-                              <span className="font-medium">${selectedService?.rate}</span>
+                              <span className="font-medium">₱{selectedService ? (parseFloat(selectedService.rate) * 60).toFixed(0) : '0'}</span>
                             </div>
                             {discount > 0 && (
                               <>
                                 <div className="flex justify-between text-sm">
                                   <span className="text-gray-600">Subtotal:</span>
-                                  <span className="font-medium">${basePrice.toFixed(2)}</span>
+                                  <span className="font-medium">₱{(basePrice * 60).toFixed(0)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                   <span className="text-green-600">Discount ({(discount * 100)}%):</span>
-                                  <span className="text-green-600">-${discountAmount.toFixed(2)}</span>
+                                  <span className="text-green-600">-₱{(discountAmount * 60).toFixed(0)}</span>
                                 </div>
                               </>
                             )}
                             <Separator />
                             <div className="flex justify-between text-lg font-bold">
                               <span className="text-gray-900">Total Price:</span>
-                              <span className="text-blue-600">${totalPrice}</span>
+                              <span className="text-blue-600">₱{(parseFloat(totalPrice) * 60).toFixed(0)}</span>
                             </div>
                             {discount > 0 && (
                               <div className="text-xs text-green-600 font-medium text-center">
@@ -867,11 +867,11 @@ export default function Home() {
                           <div className="space-y-2">
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-600">Current Balance:</span>
-                              <span className="font-medium text-green-600">${userBalance}</span>
+                              <span className="font-medium text-green-600">₱{(parseFloat(userBalance || "0") * 60).toLocaleString()}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-600">Order Total:</span>
-                              <span className="font-medium">${totalPrice}</span>
+                              <span className="font-medium">₱{(parseFloat(totalPrice) * 60).toFixed(0)}</span>
                             </div>
                             <Separator />
                             <div className="flex justify-between">
@@ -881,7 +881,7 @@ export default function Home() {
                                   ? 'text-green-600' 
                                   : 'text-red-500'
                               }`}>
-                                ${(parseFloat(userBalance) - parseFloat(totalPrice)).toFixed(2)}
+                                ₱{((parseFloat(userBalance) - parseFloat(totalPrice)) * 60).toFixed(0)}
                               </span>
                             </div>
                           </div>
@@ -899,7 +899,7 @@ export default function Home() {
                           <div className="text-center space-y-4">
                             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                               <p className="text-red-700 text-sm">
-                                Insufficient balance. You need ${(parseFloat(totalPrice) - parseFloat(userBalance)).toFixed(2)} more.
+                                Insufficient balance. You need ₱{((parseFloat(totalPrice) - parseFloat(userBalance)) * 60).toFixed(0)} more.
                               </p>
                             </div>
                             <Button
@@ -1046,7 +1046,7 @@ export default function Home() {
                   </div>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Current Balance</h3>
-                <p className="text-4xl font-bold text-green-600">${userBalance}</p>
+                <p className="text-4xl font-bold text-green-600">₱{(parseFloat(userBalance || "0") * 60).toLocaleString()}</p>
                 <p className="text-gray-500 mt-2">Available for orders</p>
               </CardContent>
             </Card>
@@ -1088,32 +1088,32 @@ export default function Home() {
                       <p className="text-lg font-bold text-gray-800 mb-2">Bonus Examples:</p>
                       <div className="space-y-2 text-sm">
                         <div className="flex items-center justify-center space-x-2">
-                          <span className="text-blue-600 font-semibold">$5</span>
+                          <span className="text-blue-600 font-semibold">₱300</span>
                           <span>+</span>
-                          <span className="text-green-600 font-bold">$1.25</span>
+                          <span className="text-green-600 font-bold">₱75</span>
                           <span>=</span>
-                          <span className="text-purple-600 font-bold">$6.25</span>
+                          <span className="text-purple-600 font-bold">₱375</span>
                         </div>
                         <div className="flex items-center justify-center space-x-2">
-                          <span className="text-blue-600 font-semibold">$10</span>
+                          <span className="text-blue-600 font-semibold">₱600</span>
                           <span>+</span>
-                          <span className="text-green-600 font-bold">$2.50</span>
+                          <span className="text-green-600 font-bold">₱150</span>
                           <span>=</span>
-                          <span className="text-purple-600 font-bold">$12.50</span>
+                          <span className="text-purple-600 font-bold">₱750</span>
                         </div>
                         <div className="flex items-center justify-center space-x-2">
-                          <span className="text-blue-600 font-semibold">$25</span>
+                          <span className="text-blue-600 font-semibold">₱1,500</span>
                           <span>+</span>
-                          <span className="text-green-600 font-bold">$6.25</span>
+                          <span className="text-green-600 font-bold">₱375</span>
                           <span>=</span>
-                          <span className="text-purple-600 font-bold">$31.25</span>
+                          <span className="text-purple-600 font-bold">₱1,875</span>
                         </div>
                         <div className="flex items-center justify-center space-x-2">
-                          <span className="text-blue-600 font-semibold">$50</span>
+                          <span className="text-blue-600 font-semibold">₱3,000</span>
                           <span>+</span>
-                          <span className="text-green-600 font-bold">$12.50</span>
+                          <span className="text-green-600 font-bold">₱750</span>
                           <span>=</span>
-                          <span className="text-purple-600 font-bold">$62.50</span>
+                          <span className="text-purple-600 font-bold">₱3,750</span>
                         </div>
                       </div>
                     </div>
@@ -1144,7 +1144,7 @@ export default function Home() {
                 <div>
                   <Label htmlFor="deposit-amount">Select Deposit Amount</Label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
-                    {[5, 10, 25, 50].map((amount) => (
+                    {[300, 600, 1500, 3000].map((amount) => (
                       <Button
                         key={amount}
                         variant="outline"
@@ -1157,26 +1157,25 @@ export default function Home() {
                               : ''
                         }`}
                       >
-                        <span className={depositAmount === amount ? "text-white font-semibold" : ""}>${amount}</span>
-                        <span className="text-xs text-gray-500">₱{(amount * 60).toLocaleString()}</span>
+                        <span className={depositAmount === amount ? "text-white font-semibold" : ""}>₱{amount.toLocaleString()}</span>
                         {isFirstTimeDeposit && (
                           <span className="text-xs bg-red-500 text-white px-1 rounded mt-1">
-                            +${(amount * 0.25).toFixed(2)}
+                            +₱{(amount * 0.25).toLocaleString()}
                           </span>
                         )}
                       </Button>
                     ))}
                   </div>
                   <div className="flex items-center space-x-2 mt-4">
-                    <Label htmlFor="custom-amount">Custom amount:</Label>
+                    <Label htmlFor="custom-amount">Custom amount (₱):</Label>
                     <Input
                       id="custom-amount"
                       type="number"
-                      min="5"
-                      max="1000"
+                      min="300"
+                      max="60000"
                       value={depositAmount}
-                      onChange={(e) => setDepositAmount(Math.max(5, parseInt(e.target.value) || 5))}
-                      className="w-24"
+                      onChange={(e) => setDepositAmount(Math.max(300, parseInt(e.target.value) || 300))}
+                      className="w-32"
                     />
                   </div>
                 </div>
@@ -1185,9 +1184,9 @@ export default function Home() {
                 <div className="space-y-4">
                   {!showGCash ? (
                     <div className="bg-blue-50 rounded-lg p-4">
-                      <h4 className="font-semibold text-gray-900 mb-2">Deposit ${depositAmount} (₱{(depositAmount * 60).toLocaleString()}) via GCash</h4>
+                      <h4 className="font-semibold text-gray-900 mb-2">Deposit ₱{depositAmount.toLocaleString()} via GCash</h4>
                       <p className="text-sm text-gray-600 mb-4">
-                        Manual payment processing through GCash. Contact us on WhatsApp to complete your deposit. Exchange rate: 1 USD = 60 PHP
+                        Manual payment processing through GCash. Contact us on WhatsApp to complete your deposit. Processing time: 2-24 hours.
                       </p>
                       <Button 
                         onClick={() => setShowGCash(true)}
@@ -1198,7 +1197,7 @@ export default function Home() {
                     </div>
                   ) : (
                     <GCashPayment 
-                      amountUSD={depositAmount.toString()}
+                      amountUSD={(depositAmount / 60).toFixed(2)}
                       onCancel={() => setShowGCash(false)}
                     />
                   )}

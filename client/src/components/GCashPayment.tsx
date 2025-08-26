@@ -25,7 +25,7 @@ export default function GCashPayment({ amountUSD, onCancel }: GCashPaymentProps)
   // Convert USD to PHP at fixed rate of 1 USD = 60 PHP
   const amountPHP = (parseFloat(amountUSD) * 60).toFixed(2);
   
-  const gcashName = "JE***L A.";
+  const gcashName = "JE***L N.";
   const gcashNumber = "09678361036";
   const whatsappNumber = "+639678361036";
   
@@ -38,7 +38,7 @@ export default function GCashPayment({ amountUSD, onCancel }: GCashPaymentProps)
   };
   
   const openWhatsApp = () => {
-    const message = `Hi! I want to deposit $${amountUSD} (₱${amountPHP}) to my account via GCash. Please confirm the payment details.`;
+    const message = `Hi! I want to deposit ₱${amountPHP} to my account via GCash. Please confirm the payment details.`;
     const whatsappUrl = `https://wa.me/${whatsappNumber.replace('+', '')}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -52,10 +52,7 @@ export default function GCashPayment({ amountUSD, onCancel }: GCashPaymentProps)
             GCash Payment
           </CardTitle>
           <div className="text-2xl font-bold text-green-600">
-            ₱{amountPHP} PHP
-          </div>
-          <div className="text-sm text-gray-600">
-            (${amountUSD} USD × 60 PHP = ₱{amountPHP})
+            ₱{amountPHP}
           </div>
         </CardHeader>
         

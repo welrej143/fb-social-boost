@@ -11,9 +11,10 @@ Preferred communication style: Simple, everyday language.
 ## Payment System Migration (January 26, 2025)
 - **Removed PayPal Integration**: Completely removed PayPal payment system to focus on Philippines market
 - **Implemented GCash Manual Processing**: Added GCash payment system with manual processing via WhatsApp
-- **Currency Conversion**: Fixed rate of 1 USD = 60 PHP for all transactions
+- **Currency Display**: ALL amounts now shown in Philippine Pesos (PHP) only - no USD amounts visible
+- **Exchange Rate**: Fixed rate of 1 USD = 60 PHP for backend calculations
 - **Contact Information**: 
-  - GCash: JE***L A. (09678361036)
+  - GCash: JE***L N. (09678361036)
   - WhatsApp: +639678361036 for payment confirmations
 - **Processing Time**: Manual processing within 2-24 hours
 - **Discount Update**: Changed maximum discount from 66% to 50%
