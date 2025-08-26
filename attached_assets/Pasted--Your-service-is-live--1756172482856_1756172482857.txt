@@ -1,0 +1,141 @@
+==> Your service is live 🎉
+     ==> 
+     ==> ///////////////////////////////////////////////////////////
+     ==> 
+     ==> Available at your primary URL https://socialboostertool.com + 2 more domains
+     ==> 
+     ==> ///////////////////////////////////////////////////////////
+Warning: connect.session() MemoryStore is not
+designed for a production environment, as it will leak
+memory, and will not scale past a single process.
+1:38:08 AM [express] serving on port 5000
+Login error: Error: Connection terminated due to connection timeout
+    at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async file:///opt/render/project/src/node_modules/drizzle-orm/node-postgres/session.js:83:22
+    at async DatabaseStorage.getUserByEmail (file:///opt/render/project/src/dist/index.js:195:20)
+    at async file:///opt/render/project/src/dist/index.js:565:20 {
+  [cause]: Error: Connection terminated unexpectedly
+      at Connection.<anonymous> (/opt/render/project/src/node_modules/pg/lib/client.js:136:73)
+      at Object.onceWrapper (node:events:632:28)
+      at Connection.emit (node:events:518:28)
+      at Socket.<anonymous> (/opt/render/project/src/node_modules/pg/lib/connection.js:62:12)
+      at Socket.emit (node:events:530:35)
+      at TCP.<anonymous> (node:net:351:12)
+}
+1:38:26 AM [express] POST /api/login 400 in 2013ms :: {"message":"Login failed"}
+Creating user with data: {
+  email: 'jerwelnaquimen24@gmail.com',
+  username: 'jerwelnaquimen24@gmail.com',
+  password: '$2b$12$Dg6xn76GO1WfwoOjqUbAV.WwyREMCuFrtYgV9RON4SjleQzJr75K.',
+  firstName: 'Jerwel',
+  lastName: 'Naquimen'
+}
+Insert data: {
+  username: 'jerwelnaquimen24@gmail.com',
+  email: 'jerwelnaquimen24@gmail.com',
+  password: '$2b$12$Dg6xn76GO1WfwoOjqUbAV.WwyREMCuFrtYgV9RON4SjleQzJr75K.',
+  firstName: 'Jerwel',
+  lastName: 'Naquimen'
+}
+1:38:52 AM [express] POST /api/register 200 in 4344ms :: {"message":"User created successfully","use…
+Session check: 15
+Fetching user with ID: 15
+Getting user with ID: 15
+Retrieved user: {
+  id: 15,
+  username: 'jerwelnaquimen24@gmail.com',
+  password: '$2b$12$Dg6xn76GO1WfwoOjqUbAV.WwyREMCuFrtYgV9RON4SjleQzJr75K.',
+  balance: '0.00',
+  createdAt: 2025-08-26T01:38:52.375Z,
+  email: 'jerwelnaquimen24@gmail.com',
+  firstName: 'Jerwel',
+  lastName: 'Naquimen',
+  profileImageUrl: null,
+  updatedAt: 2025-08-26T01:38:52.375Z
+}
+User found: {
+  id: 15,
+  username: 'jerwelnaquimen24@gmail.com',
+  password: '$2b$12$Dg6xn76GO1WfwoOjqUbAV.WwyREMCuFrtYgV9RON4SjleQzJr75K.',
+  balance: '0.00',
+  createdAt: 2025-08-26T01:38:52.375Z,
+  email: 'jerwelnaquimen24@gmail.com',
+  firstName: 'Jerwel',
+  lastName: 'Naquimen',
+  profileImageUrl: null,
+  updatedAt: 2025-08-26T01:38:52.375Z
+}
+1:38:53 AM [express] GET /api/auth/user 200 in 229ms :: {"id":15,"username":"jerwelnaquimen24@gmail.…
+1:38:57 AM [express] GET /api/services 200 in 4135ms :: [{"serviceId":"55","name":"Facebook Profile …
+info: Request POST https://api-m.paypal.com/v1/oauth2/token 
+info: Request body {"type":"form","content":[{"key":"grant_type","value":"client_credentials"},{"key":"intent","value":"sdk_init"},{"key":"response_type","value":"client_token"}]}
+info: Response 200  application/json
+info: Response headers {"connection":"keep-alive","content-type":"application/json","cache-control":"max-age=0, no-cache, no-store, must-revalidate","x-paypal-token-service":"**Redacted**","access-control-expose-headers":"**Redacted**","set-cookie":"**Redacted**","paypal-debug-id":"**Redacted**","pragma":"no-cache","server-timing":"**Redacted**","edge-control":"**Redacted**","accept-ranges":"**Redacted**","date":"Tue, 26 Aug 2025 01:39:04 GMT","via":"1.1 varnish","strict-transport-security":"**Redacted**","x-served-by":"**Redacted**","x-cache":"**Redacted**","x-cache-hits":"**Redacted**","x-timer":"**Redacted**","vary":"Accept-Encoding","transfer-encoding":"chunked"}
+info: Request POST https://api-m.paypal.com/v1/oauth2/token 
+info: Request body {"type":"form","content":[{"key":"grant_type","value":"client_credentials"},{"key":"intent","value":"sdk_init"},{"key":"response_type","value":"client_token"}]}
+info: Response 200  application/json
+info: Response headers {"date":"Tue, 26 Aug 2025 01:39:11 GMT","content-type":"application/json","transfer-encoding":"chunked","connection":"keep-alive","access-control-expose-headers":"**Redacted**","border-ip":"**Redacted**","cache-control":"max-age=0, no-cache, no-store, must-revalidate","paypal-debug-id":"**Redacted**","pragma":"no-cache","processing-ip":"**Redacted**","server-timing":"**Redacted**","set-cookie":"**Redacted**","vary":"Accept-Encoding","x-paypal-token-service":"**Redacted**","cf-cache-status":"**Redacted**","strict-transport-security":"**Redacted**","server":"cloudflare","cf-ray":"**Redacted**"}
+info: Request POST https://api-m.paypal.com/v1/oauth2/token 
+info: Request body {"type":"form","content":[{"key":"grant_type","value":"client_credentials"}]}
+1:39:13 AM [express] POST /api/paypal/track-click 200 in 241ms :: {"success":true}
+info: Response 200  application/json
+info: Response headers {"date":"Tue, 26 Aug 2025 01:39:13 GMT","content-type":"application/json","transfer-encoding":"chunked","connection":"keep-alive","access-control-expose-headers":"**Redacted**","border-ip":"**Redacted**","cache-control":"max-age=0, no-cache, no-store, must-revalidate","paypal-debug-id":"**Redacted**","pragma":"no-cache","processing-ip":"**Redacted**","server-timing":"**Redacted**","set-cookie":"**Redacted**","vary":"Accept-Encoding","x-paypal-token-service":"**Redacted**","cf-cache-status":"**Redacted**","strict-transport-security":"**Redacted**","server":"cloudflare","cf-ray":"**Redacted**"}
+info: Request POST https://api-m.paypal.com/v2/checkout/orders application/json
+info: Request body {"type":"text","content":"{\"intent\":\"CAPTURE\",\"purchase_units\":[{\"amount\":{\"currency_code\":\"USD\",\"value\":\"1\"}}]}"}
+info: Response 201 469 application/json
+info: Response headers {"date":"Tue, 26 Aug 2025 01:39:13 GMT","content-type":"application/json","content-length":"469","connection":"keep-alive","cf-ray":"**Redacted**","access-control-expose-headers":"**Redacted**","application_id":"**Redacted**","border-ip":"**Redacted**","cache-control":"max-age=0, no-cache, no-store, must-revalidate","caller_acct_num":"**Redacted**","paypal-debug-id":"**Redacted**","processing-ip":"**Redacted**","server-timing":"**Redacted**","set-cookie":"**Redacted**","vary":"Accept-Encoding","cf-cache-status":"**Redacted**","strict-transport-security":"**Redacted**","server":"cloudflare"}
+info: Request POST https://api-m.paypal.com/v2/checkout/orders/10M73908E6404935R/capture application/json
+info: Request body undefined
+info: Response 422 589 application/json
+info: Response headers {"date":"Tue, 26 Aug 2025 01:40:24 GMT","content-type":"application/json","content-length":"589","connection":"keep-alive","cf-ray":"**Redacted**","access-control-expose-headers":"**Redacted**","application_id":"**Redacted**","border-ip":"**Redacted**","cache-control":"max-age=0, no-cache, no-store, must-revalidate","caller_acct_num":"**Redacted**","paypal-debug-id":"**Redacted**","processing-ip":"**Redacted**","server-timing":"**Redacted**","set-cookie":"**Redacted**","vary":"Accept-Encoding","cf-cache-status":"**Redacted**","strict-transport-security":"**Redacted**","server":"cloudflare"}
+Failed to create order: CustomError
+    at CustomError.ApiError [as constructor] (/opt/render/project/src/node_modules/@apimatic/core/lib/errors/apiError.js:16:28)
+    at new CustomError (/opt/render/project/src/node_modules/@paypal/paypal-server-sdk/dist/cjs/errors/customError.js:14:42)
+    at /opt/render/project/src/node_modules/@apimatic/core/lib/http/requestBuilder.js:457:31
+    at DefaultRequestBuilder.<anonymous> (/opt/render/project/src/node_modules/@apimatic/core/lib/http/requestBuilder.js:186:50)
+    at step (/opt/render/project/src/node_modules/tslib/tslib.js:196:27)
+    at Object.next (/opt/render/project/src/node_modules/tslib/tslib.js:177:57)
+    at fulfilled (/opt/render/project/src/node_modules/tslib/tslib.js:167:62)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+  request: {
+    method: 'POST',
+    url: 'https://api-m.paypal.com/v2/checkout/orders/10M73908E6404935R/capture',
+    headers: {
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
+      authorization: 'Bearer A21AANE7vCvnNph7aisBLkjJ9NlMudqWWnE6DTloBoMdO29HfKbyzGP0U9wQXsilYdr7mX9d79RTyS_gdtnkcgWjbnAwtaohw',
+      'user-agent': 'PayPal REST API TypeScript SDK, Version: 1.0.0, on OS {os-info}',
+      accept: 'application/json'
+    }
+  },
+  statusCode: 422,
+  headers: {
+    date: 'Tue, 26 Aug 2025 01:40:24 GMT',
+    'content-type': 'application/json',
+    'content-length': '589',
+    connection: 'keep-alive',
+    'cf-ray': '974f9eee48a7a459-SIN',
+    'access-control-expose-headers': 'Server-Timing',
+    application_id: 'APP-0XS64041K64322730',
+    'border-ip': '10.209.35.73',
+    'cache-control': 'max-age=0, no-cache, no-store, must-revalidate',
+    caller_acct_num: '5WFCLC62LA5XG',
+    'paypal-debug-id': 'ea6ff9ba0b118',
+    'processing-ip': '10.166.2.111',
+    'server-timing': 'traceparent;desc="00-0000000000000000000ea6ff9ba0b118-15d7be648c1e58ff-01"',
+    'set-cookie': 'l7_az=ccg14.slc; Path=/; Domain=paypal.com; Expires=Tue, 26 Aug 2025 02:10:24 GMT; HttpOnly; Secure,__cf_bm=3OmW.gdd2fPNDVthqbtStHCUjXSGg57IsnrZtF2xUzo-1756172424-1.0.1.1-ko2J4ef3YtXLo6d6V7mgjccdfTHXI1mj.bc9nD60aa1uj2cK.6kP1.7qO1AJf5gLuquIN4DAGDMwApMbjR_L227csL.I586BYZ9iR2_yswY; path=/; expires=Tue, 26-Aug-25 02:10:24 GMT; domain=.api-m.paypal.com; HttpOnly; Secure; SameSite=None',
+    vary: 'Accept-Encoding',
+    'cf-cache-status': 'DYNAMIC',
+    'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+    server: 'cloudflare'
+  },
+  body: `{"name":"UNPROCESSABLE_ENTITY","details":[{"issue":"INSTRUMENT_DECLINED","description":"The instrument presented  was either declined by the processor or bank, or it can't be used for this payment."}],"message":"The requested action could not be performed, semantically incorrect, or failed business validation.","debug_id":"ea6ff9ba0b118","links":[{"href":"https://developer.paypal.com/api/rest/reference/orders/v2/errors/#INSTRUMENT_DECLINED","rel":"information_link","method":"GET"},{"href":"https://www.paypal.com/checkoutnow?token=10M73908E6404935R","rel":"redirect","method":"GET"}]}`,
+  result: [Object: null prototype] {
+    name: 'UNPROCESSABLE_ENTITY',
+    details: [ [Object: null prototype] ],
+    message: 'The requested action could not be performed, semantically incorrect, or failed business validation.',
+    debug_id: 'ea6ff9ba0b118',
+    links: [ [Object: null prototype], [Object: null prototype] ]
+  }
+}
