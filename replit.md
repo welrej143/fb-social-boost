@@ -17,10 +17,10 @@ Preferred communication style: Simple, everyday language.
   - GCash: JE***L N. (09678361036)
   - WhatsApp: +639678361036 for payment confirmations
 - **Processing Time**: Manual processing within 2-24 hours
-- **Discount Update**: Changed maximum discount from 66% to 50%
+- **Discount Update**: Changed maximum discount from 66% to 70%
   - 5000+ items: 20% discount
   - 10000+ items: 30% discount  
-  - 20000+ items: 50% discount
+  - 20000+ items: 70% discount
 - **Minimum Deposit**: Set to $5 (₱300 PHP) 
 - **Login Persistence**: Extended session to 30 days with rolling refresh
 - **Timer Persistence**: Flash sale countdown now persists across page refreshes using localStorage
