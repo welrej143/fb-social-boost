@@ -31,7 +31,7 @@ const client = new Client({
     oAuthClientSecret: PAYPAL_CLIENT_SECRET,
   },
   timeout: 0,
-  environment: Environment.Sandbox, // Use sandbox for testing with test accounts
+  environment: Environment.Production, // Use production for live payments
   logging: {
     logLevel: LogLevel.Info,
     logRequest: {

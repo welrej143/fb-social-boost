@@ -111,7 +111,7 @@ export default function PayPalButton({
       try {
         if (!(window as any).paypal) {
           const script = document.createElement("script");
-          script.src = "https://www.sandbox.paypal.com/web-sdk/v6/core"; // Use sandbox SDK
+          script.src = "https://www.paypal.com/web-sdk/v6/core"; // Use production SDK
           script.async = true;
           script.onload = () => initPayPal();
           document.body.appendChild(script);
