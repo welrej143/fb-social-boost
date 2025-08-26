@@ -52,10 +52,10 @@ export default function GCashPayment({ amountUSD, onCancel }: GCashPaymentProps)
             GCash Payment
           </CardTitle>
           <div className="text-2xl font-bold text-green-600">
-            ₱{amountPHP}
+            ₱{amountPHP} PHP
           </div>
           <div className="text-sm text-gray-600">
-            (${amountUSD} USD × 60)
+            (${amountUSD} USD × 60 PHP = ₱{amountPHP})
           </div>
         </CardHeader>
         

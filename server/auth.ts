@@ -17,10 +17,11 @@ export function getSession() {
     secret: process.env.SESSION_SECRET || "facebook-boost-secret-key-2024",
     resave: false,
     saveUninitialized: false,
+    rolling: true, // Extend session on each request
     cookie: {
       httpOnly: true,
       secure: false,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days for persistent login
       sameSite: 'lax'
     },
   });

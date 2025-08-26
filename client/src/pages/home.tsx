@@ -92,10 +92,21 @@ export default function Home() {
   const [showWallet, setShowWallet] = useState(false);
   const [showGCash, setShowGCash] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
-  const [depositAmount, setDepositAmount] = useState(1);
+  const [depositAmount, setDepositAmount] = useState(5);
   const [userBalance, setUserBalance] = useState("0.00");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(24 * 60 * 60); // 24 hours in seconds
+  const [timeLeft, setTimeLeft] = useState(() => {
+    // Get saved timer from localStorage or default to 24 hours
+    const saved = localStorage.getItem('flashSaleTimer');
+    if (saved) {
+      const savedData = JSON.parse(saved);
+      const now = Date.now();
+      const elapsed = Math.floor((now - savedData.startTime) / 1000);
+      const remaining = Math.max(0, savedData.duration - elapsed);
+      return remaining > 0 ? remaining : 24 * 60 * 60; // Reset if expired
+    }
+    return 24 * 60 * 60; // 24 hours in seconds
+  });
   const [showSpecialOffer, setShowSpecialOffer] = useState(true);
   const [isFirstTimeDeposit, setIsFirstTimeDeposit] = useState(true);
   
@@ -110,15 +121,29 @@ export default function Home() {
     }
   }, [user]);
 
-  // Countdown timer effect
+  // Countdown timer effect with localStorage persistence
   useEffect(() => {
+    // Save initial timer state to localStorage
+    const saveTimerState = (timeRemaining: number) => {
+      localStorage.setItem('flashSaleTimer', JSON.stringify({
+        startTime: Date.now(),
+        duration: timeRemaining
+      }));
+    };
+
+    // Save initial state
+    saveTimerState(timeLeft);
+
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
-        if (prevTime <= 1) {
-          // Reset to 24 hours when timer reaches 0
-          return 24 * 60 * 60;
+        const newTime = prevTime <= 1 ? 24 * 60 * 60 : prevTime - 1; // Reset to 24 hours when timer reaches 0
+        
+        // Update localStorage every minute to avoid too frequent writes
+        if (newTime % 60 === 0) {
+          saveTimerState(newTime);
         }
-        return prevTime - 1;
+        
+        return newTime;
       });
     }, 1000);
 
@@ -1119,7 +1144,7 @@ export default function Home() {
                 <div>
                   <Label htmlFor="deposit-amount">Select Deposit Amount</Label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
-                    {[1, 5, 10, 25].map((amount) => (
+                    {[5, 10, 25, 50].map((amount) => (
                       <Button
                         key={amount}
                         variant="outline"
@@ -1133,6 +1158,7 @@ export default function Home() {
                         }`}
                       >
                         <span className={depositAmount === amount ? "text-white font-semibold" : ""}>${amount}</span>
+                        <span className="text-xs text-gray-500">₱{(amount * 60).toLocaleString()}</span>
                         {isFirstTimeDeposit && (
                           <span className="text-xs bg-red-500 text-white px-1 rounded mt-1">
                             +${(amount * 0.25).toFixed(2)}
@@ -1146,10 +1172,10 @@ export default function Home() {
                     <Input
                       id="custom-amount"
                       type="number"
-                      min="1"
+                      min="5"
                       max="1000"
                       value={depositAmount}
-                      onChange={(e) => setDepositAmount(Math.max(1, parseInt(e.target.value) || 1))}
+                      onChange={(e) => setDepositAmount(Math.max(5, parseInt(e.target.value) || 5))}
                       className="w-24"
                     />
                   </div>
@@ -1159,9 +1185,9 @@ export default function Home() {
                 <div className="space-y-4">
                   {!showGCash ? (
                     <div className="bg-blue-50 rounded-lg p-4">
-                      <h4 className="font-semibold text-gray-900 mb-2">Deposit ${depositAmount} via GCash</h4>
+                      <h4 className="font-semibold text-gray-900 mb-2">Deposit ${depositAmount} (₱{(depositAmount * 60).toLocaleString()}) via GCash</h4>
                       <p className="text-sm text-gray-600 mb-4">
-                        Manual payment processing through GCash. Contact us on WhatsApp to complete your deposit.
+                        Manual payment processing through GCash. Contact us on WhatsApp to complete your deposit. Exchange rate: 1 USD = 60 PHP
                       </p>
                       <Button 
                         onClick={() => setShowGCash(true)}
